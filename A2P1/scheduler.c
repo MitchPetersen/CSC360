@@ -101,6 +101,7 @@ void task_create(task_t* handle, task_fn_t fn) {
  * \param handle  This is the handle produced by task_create
  */
 void task_wait(task_t handle) {
+  pid_t pid;
   pid = wait(&handle);
 }
 
