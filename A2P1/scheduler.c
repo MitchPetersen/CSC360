@@ -76,7 +76,7 @@ void scheduler_init() {
 					break;
 				}
 			}
-		} else if (tasks[start].state = 3 {
+		} else if (tasks[start].state = 3) {
 			int trych = getch()
 			if (try != ERR) {
 				tasks[start].input = trych;
