@@ -46,7 +46,7 @@ task_info_t tasks[MAX_TASKS]; //< Information for every task
  * functiosn in this file.
  */
 void scheduler_init() {
-	start = current_task
+	int start = current_task;
 	while(1) {
 		start++;
 		if(start > num_tasks-1) {
@@ -151,9 +151,7 @@ void task_create(task_t* handle, task_fn_t fn) {
 void task_wait(task_t handle) {
 	tasks[current_task].state = 1;
 	tasks[current_task].waitfortask = handle;
-	int tnum = current_task;
-	current_task = handle;
-	swapcontext(&tasks[tnum].context, &tasks[handle].context);
+	scheduler_init();
 }
 
 /**
