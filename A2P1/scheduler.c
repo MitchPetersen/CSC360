@@ -67,7 +67,7 @@ void scheduler_init() {
 					break;
 				}
 			} else if (tasks[start].delay != NULL) {
-				size_t curr = time_ms()
+				size_t curr = time_ms();
 				if (curr > tasks[start].delay) {
 					int curr = current_task;
 					current_task = start;
