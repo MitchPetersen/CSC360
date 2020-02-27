@@ -50,7 +50,7 @@ void scheduler_init() {
 	while(1) {
 		start++;
 		if(start > num_tasks-1) {
-			start = 1;
+			start = 0;
 		}
 		if(tasks[start].state == 0) {
 			int curr = current_task;
