@@ -104,8 +104,7 @@ void task_create(task_t* handle, task_fn_t fn) {
  */
 void task_wait(task_t handle) {
   pid_t pid;
-  pid = wait(&handle);
-  return pid;
+  while((pid = wait(&status)) > 0);
 }
 
 /**
