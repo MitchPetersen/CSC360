@@ -6,6 +6,8 @@
 #include <assert.h>
 #include <curses.h>
 #include <ucontext.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 
 #include "util.h"
 
