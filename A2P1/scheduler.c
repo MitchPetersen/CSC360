@@ -58,7 +58,7 @@ void scheduler_init() {
 			swapcontext(&tasks[curr].context, &tasks[start].context);
 			break;
 		} else if (tasks[start].state == 1) {
-			if(tasks[start].waitfortask != NULL) {
+			if(&tasks[start].waitfortask != NULL) {
 				if(tasks[tasks[start].waitfortask].state == 2) {
 					int curr = current_task;
 					current_task = start;
@@ -66,7 +66,7 @@ void scheduler_init() {
 					swapcontext(&tasks[curr].context, &tasks[start].context);
 					break;
 				}
-			} else if (tasks[start].delay != NULL) {
+			} else if (&tasks[start].delay != NULL) {
 				size_t curr = time_ms();
 				if (curr > tasks[start].delay) {
 					int curr = current_task;
@@ -78,7 +78,7 @@ void scheduler_init() {
 			}
 		} else if (tasks[start].state == 3) {
 			int trych = getch();
-			if (try != ERR) {
+			if (trych != ERR) {
 				tasks[start].input = trych;
 				int curr = current_task;
 				current_task = start;
