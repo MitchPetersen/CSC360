@@ -99,7 +99,6 @@ void scheduler_init() {
  */
 void task_exit() {
 	tasks[current_task].state = 2;
-	scheduler_init();
 }
 
 /**
