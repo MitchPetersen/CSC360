@@ -24,8 +24,8 @@ typedef struct task_info {
   // is exiting.
   ucontext_t exit_context;
   
-  int state; // 0 = running, 1 = ready, ...
-  int waitfortask;
+  int state; // 0 = ready, 1 = blocked, 2 = exited
+  task_t waitfortask;
   char* input;
   // TODO: Add fields here so you can:
   //   a. Keep track of this task's state.
@@ -45,7 +45,7 @@ task_info_t tasks[MAX_TASKS]; //< Information for every task
  */
 void scheduler_init() {
 	current_task=0;
-	num_tasks=0;
+	num_tasks=1;
 	memset((task_info_t *) tasks, 0, sizeof(tasks));
 }
 
@@ -106,7 +106,11 @@ void task_create(task_t* handle, task_fn_t fn) {
  * \param handle  This is the handle produced by task_create
  */
 void task_wait(task_t handle) {
-	// TODO: Block this task until the specified task has exited.
+	tasks[current_task].state = 1;
+	tasks[current_task].waitfortask = handle;
+	int tnum = current_task;
+	current_task = handle;
+	swapcontext(&tasks[tnum].context, &tasks[handle].context);
 }
 
 /**
