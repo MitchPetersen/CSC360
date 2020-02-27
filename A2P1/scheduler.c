@@ -163,7 +163,7 @@ void task_wait(task_t handle) {
  */
 void task_sleep(size_t ms) {
 	tasks[current_task].state = 3;
-	size_t curr = time_ms()
+	size_t curr = time_ms();
 	tasks[current_task].delay = (curr + ms);
 	scheduler_init();
 }
@@ -176,7 +176,7 @@ void task_sleep(size_t ms) {
  * \returns The read character code
  */
 int task_readchar() {
-	int input = getch()
+	int input = getch();
 	if (input == ERR) {
 		tasks[current_task].state = 3;
 		scheduler_init()
