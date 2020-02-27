@@ -24,7 +24,7 @@ typedef struct task_info {
   // is exiting.
   ucontext_t exit_context;
   
-  int state = 1; // 0 = running, 1 = ready, ...
+  int state; // 0 = running, 1 = ready, ...
   int waitfortask;
   char* input;
   // TODO: Add fields here so you can:
