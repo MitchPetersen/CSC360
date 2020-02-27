@@ -27,7 +27,7 @@ typedef struct task_info {
   
   int state; // 0 = ready, 1 = blocked, 2 = exited, 3 = waiting for input. 
   task_t waitfortask;
-  char input;
+  int input;
   size_t delay;
   // TODO: Add fields here so you can:
   //   a. Keep track of this task's state.
