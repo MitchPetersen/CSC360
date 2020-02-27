@@ -166,7 +166,7 @@ void task_wait(task_t handle) {
  * \param ms  The number of milliseconds the task should sleep.
  */
 void task_sleep(size_t ms) {
-	tasks[current_task].state = 3;
+	tasks[current_task].state = 1;
 	size_t curr = time_ms();
 	printf("%ld", curr);
 	tasks[current_task].delay = (curr + ms);
