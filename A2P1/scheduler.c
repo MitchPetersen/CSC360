@@ -58,7 +58,7 @@ void scheduler_init() {
 			swapcontext(&tasks[curr].context, &tasks[start].context);
 			break;
 		} else if (tasks[start].state == 1) {
-			if(*tasks[start].waitfortask != -1) {
+			if(tasks[start].waitfortask != -1) {
 				if(tasks[tasks[start].waitfortask].state == 2) {
 					int curr = current_task;
 					current_task = start;
@@ -66,7 +66,7 @@ void scheduler_init() {
 					swapcontext(&tasks[curr].context, &tasks[start].context);
 					break;
 				}
-			} else if (*tasks[start].delay != -1) {
+			} else if (tasks[start].delay != -1) {
 				size_t curr = time_ms();
 				if (curr > tasks[start].delay) {
 					int curr = current_task;
