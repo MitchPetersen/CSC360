@@ -6,9 +6,7 @@
 #include <assert.h>
 #include <curses.h>
 #include <ucontext.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-
+#include <string.h>
 #include "util.h"
 
 // This is an upper limit on the number of tasks we can create.
@@ -26,6 +24,9 @@ typedef struct task_info {
   // is exiting.
   ucontext_t exit_context;
   
+  int state = 1; // 0 = running, 1 = ready, ...
+  int waitfortask;
+  char* input;
   // TODO: Add fields here so you can:
   //   a. Keep track of this task's state.
   //   b. If the task is sleeping, when should it wake up?
@@ -43,7 +44,9 @@ task_info_t tasks[MAX_TASKS]; //< Information for every task
  * functiosn in this file.
  */
 void scheduler_init() {
-  // TODO: Initialize the state of the scheduler 
+	current_task=0;
+	num_tasks=0;
+	memset((task_info_t *) tasks, 0, sizeof(tasks));
 }
 
 
@@ -103,8 +106,7 @@ void task_create(task_t* handle, task_fn_t fn) {
  * \param handle  This is the handle produced by task_create
  */
 void task_wait(task_t handle) {
-  pid_t pid;
-  while((pid = wait(&handle)) > 0);
+	// TODO: Block this task until the specified task has exited.
 }
 
 /**
