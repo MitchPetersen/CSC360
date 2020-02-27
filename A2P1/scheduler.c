@@ -58,7 +58,7 @@ void scheduler_init() {
 			swapcontext(&tasks[curr].context, &tasks[start].context);
 			break;
 		} else if (tasks[start].state == 1) {
-			if(tasks[start].waitfortask) {
+			if(*tasks[start].waitfortask != -1) {
 				if(tasks[tasks[start].waitfortask].state == 2) {
 					int curr = current_task;
 					current_task = start;
@@ -66,7 +66,7 @@ void scheduler_init() {
 					swapcontext(&tasks[curr].context, &tasks[start].context);
 					break;
 				}
-			} else if (tasks[start].delay) {
+			} else if (*tasks[start].delay != -1) {
 				size_t curr = time_ms();
 				if (curr > tasks[start].delay) {
 					int curr = current_task;
@@ -134,6 +134,10 @@ void task_create(task_t* handle, task_fn_t fn) {
   // Allocate a stack for the new task and add it to the context
   tasks[index].context.uc_stack.ss_sp = malloc(STACK_SIZE);
   tasks[index].context.uc_stack.ss_size = STACK_SIZE;
+  
+  // Init values
+  tasks[index].waitfortask = -1;
+  tasks[index].delay = -1;
   
   // Now set the uc_link field, which sets things up so our task will go to the exit context when the task function finishes
   tasks[index].context.uc_link = &tasks[index].exit_context;
