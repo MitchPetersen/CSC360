@@ -168,7 +168,7 @@ void task_wait(task_t handle) {
 void task_sleep(size_t ms) {
 	tasks[current_task].state = 3;
 	size_t curr = time_ms();
-	printf("%d", curr);
+	printf("%ld", curr);
 	tasks[current_task].delay = (curr + ms);
 	scheduler_init();
 }
