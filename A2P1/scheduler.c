@@ -77,7 +77,7 @@ void scheduler_init() {
 				}
 			}
 		} else if (tasks[start].state == 3) {
-			int trych = getch()
+			int trych = getch();
 			if (try != ERR) {
 				tasks[start].input = trych;
 				int curr = current_task;
@@ -179,7 +179,7 @@ int task_readchar() {
 	int input = getch();
 	if (input == ERR) {
 		tasks[current_task].state = 3;
-		scheduler_init()
+		scheduler_init();
 		return tasks[current_task].input;
 	}
 	return input;
