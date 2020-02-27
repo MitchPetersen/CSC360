@@ -7,6 +7,7 @@
 #include <curses.h>
 #include <ucontext.h>
 #include <string.h>
+#include <time.h>
 #include "util.h"
 
 // This is an upper limit on the number of tasks we can create.
@@ -24,9 +25,10 @@ typedef struct task_info {
   // is exiting.
   ucontext_t exit_context;
   
-  int state; // 0 = ready, 1 = blocked, 2 = exited
+  int state; // 0 = ready, 1 = blocked, 2 = exited, 3 = waiting for input. 
   task_t waitfortask;
-  char* input;
+  char input;
+  size_t delay;
   // TODO: Add fields here so you can:
   //   a. Keep track of this task's state.
   //   b. If the task is sleeping, when should it wake up?
@@ -44,10 +46,50 @@ task_info_t tasks[MAX_TASKS]; //< Information for every task
  * functiosn in this file.
  */
 void scheduler_init() {
-	current_task=0;
-	num_tasks=1;
-	memset((task_info_t *) tasks, 0, sizeof(tasks));
+	start = current_task
+	while(1) {
+		start++;
+		if(start > num_tasks-1) {
+			start = 1;
+		}
+		if(tasks[start].state == 0) {
+			int curr = current_task;
+			current_task = start;
+			swapcontext(&tasks[curr].context, &tasks[start].context);
+			break;
+		} else if (tasks[start].state == 1) {
+			if(tasks[start].waitfortask != NULL) {
+				if(tasks[tasks[start].waitfortask].state == 2) {
+					int curr = current_task;
+					current_task = start;
+					tasks[start].state = 0;
+					swapcontext(&tasks[curr].context, &tasks[start].context);
+					break;
+				}
+			} else if (tasks[start].delay != NULL) {
+				size_t curr = time_ms()
+				if (curr > tasks[start].delay) {
+					int curr = current_task;
+					current_task = start;
+					tasks[start].state = 0;
+					swapcontext(&tasks[curr].context, &tasks[start].context);
+					break;
+				}
+			}
+		} else if (tasks[start].state = 3 {
+			int trych = getch()
+			if (try != ERR) {
+				tasks[start].input = trych;
+				int curr = current_task;
+				current_task = start;
+				tasks[start].state = 0;
+				swapcontext(&tasks[curr].context, &tasks[start].context);
+				break;
+			}
+		}
+	}
 }
+
 
 
 /**
@@ -56,7 +98,8 @@ void scheduler_init() {
  * because of how the contexts are set up in the task_create function.
  */
 void task_exit() {
-  // TODO: Handle the end of a task's execution here
+	tasks[current_task].state = 2;
+	scheduler_init();
 }
 
 /**
@@ -121,8 +164,10 @@ void task_wait(task_t handle) {
  * \param ms  The number of milliseconds the task should sleep.
  */
 void task_sleep(size_t ms) {
-  // TODO: Block this task until the requested time has elapsed.
-  // Hint: Record the time the task should wake up instead of the time left for it to sleep. The bookkeeping is easier this way.
+	tasks[current_task].state = 3;
+	size_t curr = time_ms()
+	tasks[current_task].delay = (curr + ms);
+	scheduler_init();
 }
 
 /**
@@ -133,8 +178,11 @@ void task_sleep(size_t ms) {
  * \returns The read character code
  */
 int task_readchar() {
-  // TODO: Block this task until there is input available.
-  // To check for input, call getch(). If it returns ERR, no input was available.
-  // Otherwise, getch() will returns the character code that was read.
-  return ERR;
+	int input = getch()
+	if (input == ERR) {
+		tasks[current_task].state = 3;
+		scheduler_init()
+		return tasks[current_task].input;
+	}
+	return input;
 }
