@@ -2,6 +2,7 @@
 #include <pthread.h>
 #include <string.h>
 #include <stdlib.h>
+#include <assert.h>
 
 void func(int arr[], int val) {
 	
