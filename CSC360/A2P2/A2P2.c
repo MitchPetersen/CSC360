@@ -59,7 +59,7 @@ char** str_split(char* a_str, const char a_delim)
 int main(int argc, char** argv) {
 	FILE *input;
 	input = fopen(argv[1], "r");
-	int numbers[4000];
+	float numbers[4000];
 	char** tokens;
 	if (input == NULL) {
 		fprintf(stderr, "problem reading file\n");
@@ -74,8 +74,7 @@ int main(int argc, char** argv) {
 			linenum++;
 		} else {
 			tokens = str_split(line, ',');
-			numbers[linenum-1] = atoi(tokens[1]);
-			printf("%s\n", tokens[1]);
+			numbers[linenum-1] = atof(tokens[1]);
 			linenum++;
 		}
 	}
