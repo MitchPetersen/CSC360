@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <pthread.h>
 #include <string.h>
-#include <stdlib.c>
+#include <stdlib.h>
 
 void func(int arr[], int val) {
 	
