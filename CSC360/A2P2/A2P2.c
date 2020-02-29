@@ -67,14 +67,13 @@ int main(int argc, char** argv) {
 	}
 	char line[256];
 	int linenum = 0;
-	char delim[] = ",";
-	char *ptr;
 	while(fgets(line, sizeof(line), input)) {
 		if (linenum==0) {
 			linenum++;
 		} else {
 			tokens = str_split(line, ',');
 			numbers[linenum-1] = atof(tokens[1]);
+			printf("%f\n", numbers[linenum-1]);
 			linenum++;
 		}
 	}
