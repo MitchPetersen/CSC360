@@ -75,7 +75,7 @@ int main(int argc, char** argv) {
 		} else {
 			tokens = str_split(line, ',');
 			numbers[linenum-1] = atoi(tokens[1]);
-			print("%s\n", tokens[1]);
+			printf("%s\n", tokens[1]);
 			linenum++;
 		}
 	}
