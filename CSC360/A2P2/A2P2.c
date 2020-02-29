@@ -1,9 +1,10 @@
 #include <stdio.h>
+#define _POSIX_C_SOURCE 200809L
 #include <pthread.h>
 #include <string.h>
 #include <stdlib.h>
 #include <assert.h>
-#define _POSIX_C_SOURCE 200809L
+
 
 void func(int arr[], int val) {
 	
