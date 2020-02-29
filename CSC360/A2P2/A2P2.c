@@ -60,7 +60,6 @@ int main(int argc, char** argv) {
 	FILE *input;
 	input = fopen(argv[1], "r");
 	int numbers[4000];
-	int dates[4000];
 	char** tokens;
 	if (input == NULL) {
 		fprintf(stderr, "problem reading file\n");
@@ -75,7 +74,9 @@ int main(int argc, char** argv) {
 			linenum++;
 		} else {
 			tokens = str_split(line, ',');
-			printf("%s\n", tokens[0]);
+			numbers[linenum-1] = atoi(tokens[1]);
+			print("%s\n", tokens[1]);
+			linenum++;
 		}
 	}
 	
