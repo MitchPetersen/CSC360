@@ -57,7 +57,7 @@ char** str_split(char* a_str, const char a_delim)
 
 int main(int argc, char** argv) {
 	FILE *input;
-	input = fopen(arv[1], "r");
+	input = fopen(argv[1], "r");
 	int numbers[4000];
 	int dates[4000];
 	char** tokens;
