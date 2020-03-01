@@ -38,7 +38,7 @@ int main(int argc, char** argv) {
 	
 	for(int i=0; i<5; i++){
 		phil_id[i]=i;
-		sem_init(&chops[i]);
+		sem_init(&chops[i], 0, 1);
 	}
 	for(int i=0; i<5; i++){
 		pthread_create(&philosophers[i], NULL, eat, &phil_id[i]);
