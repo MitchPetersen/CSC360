@@ -41,7 +41,6 @@ void *func(void* i) {
 	int index = *(int *) i;
 	float minimum_distance = FLT_MAX;
 	datapoint_size = sizeof(numbers)/sizeof(float);
-	printf("%d", datapoint_size);
 	for(int i = index; i<datapoint_size; i+=num_threads){
 		for(int j = index+1; j<datapoint_size; j++){
 			line line_obj;
@@ -131,6 +130,9 @@ int main(int argc, char** argv) {
 		}
 	}
 	fclose(input);
+	datapoint_size = sizeof(numbers)/sizeof(float);
+	printf("%d\n", datapoint_size);
+	
 	pthread_t thread_arr[num_threads];
 	for (int i=0; i<num_threads; i++){
 		pthread_create(&thread_arr[i], NULL, func, &i);
