@@ -9,7 +9,7 @@
 extern char* strdup(const char*);
 
 float numbers[4000];
-int datapoint_size;
+int datapoint_size=0;
 int num_threads = 4;
 
 typedef struct line {
@@ -40,7 +40,6 @@ float dist(line line_obj, float y, float x){
 void *func(void* i) {
 	int index = *(int *) i;
 	float minimum_distance = FLT_MAX;
-	datapoint_size = sizeof(numbers)/sizeof(float);
 	for(int i = index; i<datapoint_size; i+=num_threads){
 		for(int j = index+1; j<datapoint_size; j++){
 			line line_obj;
@@ -127,11 +126,10 @@ int main(int argc, char** argv) {
 			tokens = str_split(lines, ',');
 			numbers[linenum-1] = atof(tokens[1]);
 			linenum++;
+			datapoint_size+=1;
 		}
 	}
 	fclose(input);
-	datapoint_size = sizeof(numbers)/sizeof(float);
-	printf("%d\n", datapoint_size);
 	
 	pthread_t thread_arr[num_threads];
 	for (int i=0; i<num_threads; i++){
