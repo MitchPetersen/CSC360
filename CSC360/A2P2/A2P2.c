@@ -43,7 +43,7 @@ void *func(void* i) {
 	for(int i = index; i<datapoint_size; i+=num_threads){
 		for(int j = index+1; j<datapoint_size; j++){
 			line line_obj;
-			if(index==0){
+			if(index==1){
 				printf("%f, %f\n",numbers[i],numbers[j]);
 			}
 			line_obj.slope = slope_calc(numbers[i], numbers[j], i, j);
