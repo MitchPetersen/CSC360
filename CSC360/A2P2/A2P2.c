@@ -49,6 +49,7 @@ void *func(void* i) {
 			for(int k=0; k<datapoint_size; k++){
 				total_distance += dist(line_obj, numbers[k], k);
 			}
+			printf("SAR: %f  Slope: %f  intercept: %f\n", total_distance, line_obj.slope, line_obj.intercept);
 			if (total_distance<minimum_distance){
 				minimum_distance = total_distance;
 				line_obj.SAR=minimum_distance;
