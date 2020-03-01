@@ -140,7 +140,7 @@ int main(int argc, char** argv) {
 	float sar = FLT_MAX;
 	for (int i=0; i<num_threads; i++){
 		if(bestline[i].SAR<sar){
-			sar = bestline[i].sar;
+			sar = bestline[i].SAR;
 			best = bestline[i];
 		}
 	}
