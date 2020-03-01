@@ -123,7 +123,7 @@ int main(int argc, char** argv) {
 		if (linenum==0) {
 			linenum++;
 		} else {
-			tokens = str_split(line, ',');
+			tokens = str_split(lines, ',');
 			numbers[linenum-1] = atof(tokens[1]);
 			printf("%f\n", numbers[linenum-1]);
 			linenum++;
