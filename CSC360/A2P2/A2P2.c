@@ -18,18 +18,13 @@ typedef struct line {
 	float SAR;
 } line;
 
-line bestline[4];
+line bestline[num_threads];
 
 line slope_calc(float y1, float y2, float x1, float x2){
 	line line_obj;
 	line_obj.slope = (y2-y1)/(x2-x1);
 	line_obj.intercept=y1-(line_obj.slope*x1);
 	return line_obj;
-}
-
-float intercept_calc(float slope, float x, float y){
-	float intercept = y-(slope*x);
-	return intercept;
 }
 
 float dist(line line_obj, float y, float x){
@@ -50,7 +45,7 @@ void *func(void* i) {
 			for(int k=0; k<datapoint_size; k++){
 				total_distance += dist(line_obj, numbers[k], k);
 			}
-			//printf("SAR: %f  Slope: %f  intercept: %f\n", total_distance, line_obj.slope, line_obj.intercept);
+			printf("SAR: %f  Slope: %f  intercept: %f\n", total_distance, line_obj.slope, line_obj.intercept);
 			if (total_distance<minimum_distance){
 				bestline[i] = line_obj;
 				minimum_distance = total_distance;
