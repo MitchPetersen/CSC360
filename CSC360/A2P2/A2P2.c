@@ -33,7 +33,7 @@ float intercept_calc(float slope, float x, float y){
 float dist(line line_obj, float y, float x){
 	float p2 = (line_obj.slope*x)+line_obj.intercept;
 	float dist = y-p2;
-	dist = fabs(dist);
+	dist = fabsf(dist);
 	return dist;
 }
 
@@ -43,8 +43,8 @@ void *func(void* i) {
 	for(int i = index; i<datapoint_size; i+=num_threads){
 		for(int j = index+1; j<datapoint_size; j++){
 			line line_obj;
-			line_obj.slope = slope_calc(numbers[i], numbers[j], i, j);
-			line_obj.intercept = intercept_calc(line_obj.slope, i, j);
+			line_obj.slope = slope_calc(numbers[i], numbers[j], (float) i, (float) j);
+			line_obj.intercept = intercept_calc(line_obj.slope, (float) i, (float) j);
 			float total_distance=0;
 			for(int k=0; k<datapoint_size; k++){
 				total_distance += dist(line_obj, numbers[k], k);
