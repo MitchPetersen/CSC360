@@ -20,9 +20,11 @@ typedef struct line {
 
 line bestline[4];
 
-float slope_calc(float y1, float y2, float x1, float x2){
-	float slope = (y2-y1)/(x2-x1);
-	return slope;
+line slope_calc(float y1, float y2, float x1, float x2){
+	line line_obj;
+	line_obj.slope = (y2-y1)/(x2-x1);
+	line_obj.intercept=y1-(line_obj.slope*x1);
+	return line_obj;
 }
 
 float intercept_calc(float slope, float x, float y){
@@ -43,8 +45,7 @@ void *func(void* i) {
 	for(int i = index; i<datapoint_size; i+=num_threads){
 		for(int j = index+1; j<datapoint_size; j++){
 			line line_obj;
-			line_obj.slope = slope_calc(numbers[i], numbers[j], (float) i, (float) j);
-			line_obj.intercept = intercept_calc(line_obj.slope, (float) i, numbers[i]);
+			line_obj = slope_calc(numbers[i], numbers[j], (float) i, (float) j);
 			float total_distance=0;
 			for(int k=0; k<datapoint_size; k++){
 				total_distance += dist(line_obj, numbers[k], k);
