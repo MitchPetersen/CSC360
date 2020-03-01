@@ -130,7 +130,7 @@ int main(int argc, char** argv) {
 		}
 	}
 	fclose(input);
-	
+	printf("%d", datapoint_size);
 	pthread_t thread_arr[num_threads];
 	for (int i=0; i<num_threads; i++){
 		pthread_create(&thread_arr[i], NULL, func, &i);
