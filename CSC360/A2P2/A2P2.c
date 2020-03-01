@@ -31,8 +31,8 @@ float intercept_calc(float slope, float x, float y){
 }
 
 float dist(line line_obj, float y, float x){
-	float p2 = (line_obj.slope*x)+line_obj.intercept;
-	float dist = p2-y;
+	float p2 = (line_obj.slope*y)+line_obj.intercept;
+	float dist = p2-x;
 	dist = fabs(dist);
 	return dist;
 }
