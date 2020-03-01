@@ -133,8 +133,12 @@ int main(int argc, char** argv) {
 	fclose(input);
 	printf("datapoint: %d\n", datapoint_size);
 	pthread_t thread_arr[num_threads];
+	int num_array[num_threads];
+	for (int k=0; k<num_threads; k++){
+		num_array[k]=k;
+	}
 	for (int i=0; i<num_threads; i++){
-		pthread_create(&thread_arr[i], NULL, func, &i);
+		pthread_create(&thread_arr[i], NULL, func, &num_array[i]);
 	}
 	for (int i=0; i<num_threads; i++){
 		pthread_join(thread_arr[i], NULL);
