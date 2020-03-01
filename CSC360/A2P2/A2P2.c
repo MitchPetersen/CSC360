@@ -44,7 +44,7 @@ void *func(void* i) {
 		for(int j = index+1; j<datapoint_size; j++){
 			line line_obj;
 			line_obj.slope = slope_calc(numbers[i], numbers[j], (float) i, (float) j);
-			line_obj.intercept = intercept_calc(line_obj.slope, (float) i, numbers[j]);
+			line_obj.intercept = intercept_calc(line_obj.slope, (float) i, numbers[i]);
 			float total_distance=0;
 			for(int k=0; k<datapoint_size; k++){
 				total_distance += dist(line_obj, numbers[k], k);
