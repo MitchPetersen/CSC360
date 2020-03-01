@@ -43,7 +43,9 @@ void *func(void* i) {
 	for(int i = index; i<datapoint_size; i+=num_threads){
 		for(int j = index+1; j<datapoint_size; j++){
 			line line_obj;
-			printf("%f, %f\n",numbers[i],numbers[j]);
+			if(index==0){
+				printf("%f, %f\n",numbers[i],numbers[j]);
+			}
 			line_obj.slope = slope_calc(numbers[i], numbers[j], i, j);
 			line_obj.intercept = intercept_calc(line_obj.slope, i, j);
 			float total_distance=0;
