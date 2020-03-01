@@ -31,8 +31,8 @@ float intercept_calc(float slope, float x, float y){
 }
 
 float dist(line line_obj, float y, float x){
-	float p2 = (line_obj.slope*y)+line_obj.intercept;
-	float dist = p2-x;
+	float p2 = (line_obj.slope*x)+line_obj.intercept;
+	float dist = y-p2;
 	dist = fabs(dist);
 	return dist;
 }
@@ -51,9 +51,10 @@ void *func(void* i) {
 			}
 			printf("SAR: %f  Slope: %f  intercept: %f\n", total_distance, line_obj.slope, line_obj.intercept);
 			if (total_distance<minimum_distance){
-				minimum_distance = total_distance;
-				line_obj.SAR=minimum_distance;
 				bestline[i] = line_obj;
+				minimum_distance = total_distance;
+				bestline[i].SAR=minimum_distance;
+				
 			}
 		}
 	}
