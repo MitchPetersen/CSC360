@@ -117,9 +117,9 @@ int main(int argc, char** argv) {
 		fprintf(stderr, "problem reading file\n");
 		exit(1);
 	}
-	char line[256];
+	char lines[256];
 	int linenum = 0;
-	while(fgets(line, sizeof(line), input)) {
+	while(fgets(lines, sizeof(line), input)) {
 		if (linenum==0) {
 			linenum++;
 		} else {
