@@ -9,8 +9,13 @@
 int phil_id[5];
 sem_t chops[5];
 
+void get_max_min(int* min, int* max){
+	min = min<max?min:max;
+	max = min>max?min:max;
+}
+
 void* eat(void* id){
-	int index = *(void*) id;
+	int index = *(int*) id;
 	int min = index;
 	int max = index+1%5;
 	get_max_min(&min, &max);
@@ -24,11 +29,6 @@ void* eat(void* id){
 		sem_post(&chops[max]);
 		sem_post(&chops[min]);
 	}
-}
-
-void get_max_min(int* min, int* max){
-	min = min<max?min:max;
-	max = min>max?min:max;
 }
 
 int main(int argc, char** argv) {
