@@ -119,7 +119,7 @@ int main(int argc, char** argv) {
 	}
 	char lines[256];
 	int linenum = 0;
-	while(fgets(lines, sizeof(line), input)) {
+	while(fgets(lines, sizeof(lines), input)) {
 		if (linenum==0) {
 			linenum++;
 		} else {
