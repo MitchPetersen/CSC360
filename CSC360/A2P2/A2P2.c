@@ -124,14 +124,14 @@ int main(int argc, char** argv) {
 		} else {
 			tokens = str_split(lines, ',');
 			numbers[linenum-1] = atof(tokens[1]);
-			printf("%f\n", numbers[linenum-1]);
+			//printf("%f\n", numbers[linenum-1]);
 			linenum++;
 			
 			datapoint_size+=1;
 		}
 	}
 	fclose(input);
-	printf("datapoint: %d\n", datapoint_size);
+	//printf("datapoint: %d\n", datapoint_size);
 	pthread_t thread_arr[num_threads];
 	int num_array[num_threads];
 	for (int k=0; k<num_threads; k++){
