@@ -136,11 +136,12 @@ int main(int argc, char** argv) {
 	for (int i=0; i<num_threads; i++){
 		pthread_join(thread_arr[i], NULL);
 	}
+	line best = bestline[0];
 	float sar = FLT_MAX;
 	for (int i=0; i<num_threads; i++){
 		if(bestline[i].SAR<sar){
 			sar = bestline[i].SAR;
-			line best = bestline[i];
+			best = bestline[i];
 		}
 	}
 	printf("Best Line:\nSlope: %f\nIntercept: %f\nSAR: %f\n", best.slope, best.intercept, best.SAR);
