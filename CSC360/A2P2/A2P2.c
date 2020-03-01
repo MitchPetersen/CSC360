@@ -15,7 +15,7 @@ struct line {
 	float SAR;
 } line;
 
-line bestline[4]
+line bestline[4];
 
 float slope_calc(float y1, float y2, float x1, float x2){
 	float slope = (y2-y1)/(x2-x1);
