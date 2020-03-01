@@ -44,12 +44,12 @@ void *func(void* i) {
 		for(int j = index+1; j<datapoint_size; j++){
 			line line_obj;
 			line_obj.slope = slope_calc(numbers[i], numbers[j], (float) i, (float) j);
-			line_obj.intercept = intercept_calc(line_obj.slope, (float) i, (float) j);
+			line_obj.intercept = intercept_calc(line_obj.slope, (float) i, numbers[j]);
 			float total_distance=0;
 			for(int k=0; k<datapoint_size; k++){
 				total_distance += dist(line_obj, numbers[k], k);
 			}
-			printf("SAR: %f  Slope: %f  intercept: %f\n", total_distance, line_obj.slope, line_obj.intercept);
+			//printf("SAR: %f  Slope: %f  intercept: %f\n", total_distance, line_obj.slope, line_obj.intercept);
 			if (total_distance<minimum_distance){
 				bestline[i] = line_obj;
 				minimum_distance = total_distance;
