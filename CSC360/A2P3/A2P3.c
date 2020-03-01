@@ -6,6 +6,7 @@
 #include <math.h>
 #include <float.h>
 #include <unistd.h>
+#include <semaphors.h>
 
 int phil_id[5];
 sem_t chops[5];
