@@ -17,7 +17,6 @@ void get_max_min(int* min, int* max){
 }
 
 void* eat(void* id){
-	printf("here");
 	int index = *(int*) id;
 	int min = index;
 	int max = index+1%5;
@@ -35,17 +34,16 @@ void* eat(void* id){
 }
 
 int main(int argc, char** argv) {
+	printf("1");
 	pthread_t philosophers[5];
 	
 	for(int i=0; i<5; i++){
 		phil_id[i]=i;
 		sem_init(&chops[i], 0, 1);
 	}
-	printf("1");
 	for(int i=0; i<5; i++){
 		pthread_create(&philosophers[i], NULL, eat, &phil_id[i]);
 	}
-	printf("2");
 	for(int i=0; i<5; i++){
 		pthread_join(philosophers[i], NULL);
 	}
