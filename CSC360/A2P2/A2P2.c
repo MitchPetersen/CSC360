@@ -3,6 +3,8 @@
 #include <string.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <math.h>
+
 extern char* strdup(const char*);
 
 float numbers[4000];
