@@ -125,7 +125,6 @@ int main(int argc, char** argv) {
 		} else {
 			tokens = str_split(lines, ',');
 			numbers[linenum-1] = atof(tokens[1]);
-			printf("%f\n", numbers[linenum-1]);
 			linenum++;
 		}
 	}
