@@ -18,7 +18,7 @@ typedef struct line {
 	float SAR;
 } line;
 
-line bestline[num_threads];
+line bestline[4];
 
 line slope_calc(float y1, float y2, float x1, float x2){
 	line line_obj;
