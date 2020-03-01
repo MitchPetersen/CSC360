@@ -9,7 +9,7 @@ float numbers[4000];
 int datapoint_size;
 int num_threads = 4;
 
-struct line {
+typedef struct line {
 	float intercept;
 	float slope;
 	float SAR;
