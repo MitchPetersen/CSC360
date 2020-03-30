@@ -27,6 +27,9 @@ FILE* disk;
 	else {
 		
 		disk = fopen("../disk/vdisk", "rb+"); // create the file to be written to in binary mode
+		char* init = calloc(BLOCK_SIZE*NUM_BLOCKS, 1);
+		fwrite(init, BLOCK_SIZE*NUM_BLOCKS, 1, disk);
+		free(init);
 
 	}
 	initLLFS( disk );
