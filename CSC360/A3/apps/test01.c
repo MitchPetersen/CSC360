@@ -29,7 +29,7 @@ FILE* disk;
 		disk = fopen("../disk/vdisk", "rb+"); // create the file to be written to in binary mode
 
 	}
-	//initLLFS( disk );
+	initLLFS( disk );
 
 	read_superblock ( disk );
 	

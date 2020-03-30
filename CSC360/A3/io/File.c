@@ -963,14 +963,14 @@ void make_directory (FILE* disk, char* input){
 	
 	int saved_parent_inode_block_num = -1;
 	
-		int newest_root_inode_index = get_root_inode_index (disk);
-			
-		int root_inode_block_num = find_mapping(disk, newest_root_inode_index);
+	int newest_root_inode_index = get_root_inode_index (disk);
+		
+	int root_inode_block_num = find_mapping(disk, newest_root_inode_index);
 
-		short result_block_num4[12];
-		read_inode(disk, root_inode_block_num, result_block_num4);
-			
-		saved_parent_inode_block_num = root_inode_block_num;
+	short result_block_num4[12];
+	read_inode(disk, root_inode_block_num, result_block_num4);
+		
+	saved_parent_inode_block_num = root_inode_block_num;
 	
 	while(fake_curr_dir_name != NULL) {
 
