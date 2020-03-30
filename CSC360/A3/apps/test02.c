@@ -27,8 +27,6 @@ FILE* disk;
 	else {
 		
 		disk = fopen("../disk/vdisk", "rb+"); // create the file to be written to in binary mode
-
-		robust_check (disk);
 		
 		char* init = calloc(BLOCK_SIZE*NUM_BLOCKS, 1);
 		fwrite(init, BLOCK_SIZE*NUM_BLOCKS, 1, disk);
@@ -38,14 +36,6 @@ FILE* disk;
 	
 	initLLFS( disk );
 
-	
-	//  robust	: update metadata (inode - size+flag), and save the last command run on the programme, 
-	
-	//			 if Mkdir/Mkfile/delete involved, compare vdisk content (inode size)
-
-	//			 if we found data not match, we will run the last command again 
-
-	//		     we have to change: FILE* disk = fopen("../disk/vdisk", "wb+")
 	
 	fclose(disk);
     return 0;
