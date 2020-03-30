@@ -69,6 +69,18 @@ void update_superblock(FILE* disk){
 	free(buffer);
 }
 
+void robust_superblock( FILE* disk, char* input, int content_length ){
+
+	char* buffer = (char*)calloc(BLOCK_SIZE, 1);
+    readBlock(disk, 0, buffer, BLOCK_SIZE);
+	
+	memcpy( buffer+16, &content_length, 4 );
+	memcpy( buffer+20, input, 60 );
+	
+	writeBlock(disk, 0, buffer, BLOCK_SIZE);	
+	free(buffer);
+}
+
 void create_free_block_vector(FILE* disk){      // block 1 - 8
 
 	for (int j = 1 ; j < 9 ; j++) {
