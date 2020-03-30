@@ -34,7 +34,6 @@ void* eat(void* id){
 }
 
 int main(int argc, char** argv) {
-	printf("1");
 	pthread_t philosophers[5];
 	
 	for(int i=0; i<5; i++){
