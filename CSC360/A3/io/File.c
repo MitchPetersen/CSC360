@@ -954,7 +954,7 @@ void make_directory (FILE* disk, char* input){
 	
 	const char s[2] = "/";
 
-	fake_curr_dir_name = strtok(input, s);		// skip the first command "Mkdir"
+	fake_curr_dir_name = strtok(input, s);		// skip "Mkdir"
 
 	strncpy(parent_directory_name, curr_dir_name, 31);
 	strncpy(curr_dir_name, fake_curr_dir_name, 31);
@@ -977,8 +977,8 @@ void make_directory (FILE* disk, char* input){
 		strncpy(parent_directory_name, curr_dir_name, 31);
 		strncpy(curr_dir_name, fake_curr_dir_name, 31);
 		fake_curr_dir_name = strtok(NULL, s);
-		//printf("curr_dir_name: %s ", curr_dir_name);
-		//printf("parent_directory_name: %s\n", parent_directory_name);
+		printf("curr_dir_name: %s ", curr_dir_name);
+		printf("parent_directory_name: %s\n", parent_directory_name);
 
 		if (fake_curr_dir_name == NULL){
 
