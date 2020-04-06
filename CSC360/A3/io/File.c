@@ -603,16 +603,16 @@ void createFile(FILE* disk, char* fileContent, int parentDirectoryInode, char* f
 		fillFreeBlockVector(disk, freeBlockNumber2);
 
 		
-		int next_freeInodeIndex3;
+		int nextFreeInodeIndex;
 		
-		findNextFreeInode(disk, &next_freeInodeIndex3);
-		addMapping(disk, next_freeInodeIndex4, freeBlockNumber3);
+		findNextFreeInode(disk, &nextFreeInodeIndex);
+		addMapping(disk, nextFreeInodeIndex, freeBlockNumber3);
 		
 		
 		inodeNum++;
 		updateSuperblock(disk);
 		
-		int file_inodeNum = next_freeInodeIndex4;   
+		int file_inodeNum = nextFreeInodeIndex;   
 		editParentDirectory(disk, parentDirectoryInode, file_inodeNum, fileName);
 	}
 	else {
