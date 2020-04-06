@@ -8,9 +8,9 @@ const int NUM_BLOCKS = 4096;
 const int INODE_SIZE = 32;
 
 int NUM_INODE = 0;
-int root_inode_index = -1;
-int magic_number = 1;
-int mapping_block_start = 9; // block 9-24 for inode #1 - #2048
+int ROOT_INODE_INDEX = -1;
+int MAGIC = 1;
+int MAPPING_BLOCK_START = 9; // block 9-24 for inode #1 - #2048
 int x = 1;
 
 
@@ -24,12 +24,12 @@ void readBlock(FILE* disk, int blockNum, char* buffer, int size){
     fread(buffer, size, 1, disk);
 }
 
-void create_superblock(FILE* disk){
-	char* buffer =(char*)calloc(BLOCK_SIZE, 1);
-	memcpy(buffer, &magic_number, 4);
+void createSuperblock(FILE* disk){
+	char* buffer = (char*)calloc(BLOCK_SIZE, 1);
+	memcpy(buffer, &MAGIC, 4);
 	memcpy(buffer+4, &NUM_BLOCKS, 4);
 	memcpy(buffer+8, &NUM_INODE, 4);
-	memcpy(buffer+12, &root_inode_index, 4);
+	memcpy(buffer+12, &ROOT_INODE_INDEX, 4);
 	memcpy(buffer+20, "NONE", 60);
 	writeBlock(disk, 0, buffer, BLOCK_SIZE);
 	free(buffer);
@@ -37,41 +37,41 @@ void create_superblock(FILE* disk){
 
 
 void read_superblock(FILE* disk){ // reads block 0
-	char* buffer =(char*)calloc(BLOCK_SIZE, 1);
+	char* buffer = (char*)calloc(BLOCK_SIZE, 1);
     readBlock(disk, 0, buffer, BLOCK_SIZE);	
 	memcpy(&NUM_INODE, buffer+8, 4);
-	memcpy(&root_inode_index, buffer+12, 4);
+	memcpy(&ROOT_INODE_INDEX, buffer+12, 4);
 	free(buffer);
 }
 
 
-int get_root_inode_index(FILE* disk){
+int get_ROOT_INODE_INDEX(FILE* disk){
 	
-	char* buffer =(char*)calloc(BLOCK_SIZE, 1);
+	char* buffer = (char*)calloc(BLOCK_SIZE, 1);
     readBlock(disk, 0, buffer, BLOCK_SIZE);	
 	
-	int temp_root_inode_index;
-	memcpy(&temp_root_inode_index, buffer+12, 4);
+	int temp_ROOT_INODE_INDEX;
+	memcpy(&temp_ROOT_INODE_INDEX, buffer+12, 4);
 	
 	free(buffer);
 	
-	return temp_root_inode_index;
+	return temp_ROOT_INODE_INDEX;
 }
 
 
 void update_superblock(FILE* disk){
-	char* buffer =(char*)calloc(BLOCK_SIZE, 1);
+	char* buffer = (char*)calloc(BLOCK_SIZE, 1);
     readBlock(disk, 0, buffer, BLOCK_SIZE);
 	memcpy(buffer+4, &NUM_BLOCKS, 4);
 	memcpy(buffer+8, &NUM_INODE, 4);
-	memcpy(buffer+12, &root_inode_index, 4);
+	memcpy(buffer+12, &ROOT_INODE_INDEX, 4);
 	writeBlock(disk, 0, buffer, BLOCK_SIZE);
 	free(buffer);
 }
 
 void robust_superblock(FILE* disk, char* input, int content_length){
 
-	char* buffer =(char*)calloc(BLOCK_SIZE, 1);
+	char* buffer = (char*)calloc(BLOCK_SIZE, 1);
     readBlock(disk, 0, buffer, BLOCK_SIZE);
 	
 	memcpy(buffer+16, &content_length, 4);
@@ -118,7 +118,7 @@ void read_free_block_vector(FILE* disk, int* find_free_block_num){      // block
 	
 	for(int i = 1;(i < 9)&&(find_signal == 0) ; i++){	
 		
-		char* buffer5 =(char*)calloc(BLOCK_SIZE, 1);
+		char* buffer5 = (char*)calloc(BLOCK_SIZE, 1);
 
 		readBlock(disk, i, buffer5, BLOCK_SIZE);
 		
@@ -140,7 +140,7 @@ void fill_free_block_vector(FILE* disk, int fill_block_num){      // block 1 - 8
 	
 	int free_block_num = fill_block_num / 128; 
 	int remainder = fill_block_num % 128;
-	char* buffer5 =(char*)calloc(BLOCK_SIZE, 1);	
+	char* buffer5 = (char*)calloc(BLOCK_SIZE, 1);	
 
 	readBlock(disk, free_block_num+1, buffer5, BLOCK_SIZE);
 	buffer5[remainder] = '0';
@@ -154,7 +154,7 @@ void delete_free_block_vector(FILE* disk, int del_block_num){      // block 1 - 
 	
 	int free_block_num = del_block_num / 128; 
 	int remainder = del_block_num % 128;
-	char* buffer5 =(char*)calloc(BLOCK_SIZE, 1);	
+	char* buffer5 = (char*)calloc(BLOCK_SIZE, 1);	
 
 	readBlock(disk, free_block_num+1, buffer5, BLOCK_SIZE);
 	buffer5[remainder] = '1';
@@ -166,9 +166,9 @@ void delete_free_block_vector(FILE* disk, int del_block_num){      // block 1 - 
 
 void add_mapping(FILE* disk, int inode_num, int inode_block_num){	// assume max inode=2048, 2048*4/512=16
 
-	int temp_num =(inode_num-1) / 128; 								// inode#-1 because #1 at position#0
-	int mapping_block = mapping_block_start + temp_num;    				//(block 9 - 24)
-	char* buffer6 =(char*)calloc(BLOCK_SIZE, 1);
+	int temp_num = (inode_num-1) / 128; 								// inode#-1 because #1 at position#0
+	int mapping_block = MAPPING_BLOCK_START + temp_num;    				//(block 9 - 24)
+	char* buffer6 = (char*)calloc(BLOCK_SIZE, 1);
 
 	readBlock(disk, mapping_block, buffer6, BLOCK_SIZE);
 
@@ -187,7 +187,7 @@ void find_next_free_inode_num(FILE* disk, int* inode_num){
 
 	for(int i = 9;(i < 24)&&(find_signal == 0) ; i++){	
 		
-		char* buffer5 =(char*)calloc(BLOCK_SIZE, 1);
+		char* buffer5 = (char*)calloc(BLOCK_SIZE, 1);
 		
 		readBlock(disk, i, buffer5, BLOCK_SIZE);
 		
@@ -211,10 +211,10 @@ void find_next_free_inode_num(FILE* disk, int* inode_num){
 
 int find_mapping(FILE* disk, int inode_num){
 
-	int temp_num =(inode_num-1) / 128; 
-	int mapping_block = mapping_block_start + temp_num;    //(block 9 - 24)
+	int temp_num = (inode_num-1) / 128; 
+	int mapping_block = MAPPING_BLOCK_START + temp_num;    //(block 9 - 24)
 
-	char* buffer6 =(char*)calloc(BLOCK_SIZE, 1);
+	char* buffer6 = (char*)calloc(BLOCK_SIZE, 1);
 	readBlock(disk, mapping_block, buffer6, BLOCK_SIZE);
 	
 	int temp_block_num;
@@ -229,10 +229,10 @@ int find_mapping(FILE* disk, int inode_num){
 
 void delete_mapping(FILE* disk, int inode_num){		// assume max inode = 2048
 
-	int temp_num =(inode_num-1) / 128; 
-	int mapping_block = mapping_block_start + temp_num;    //(block 9 - 24)
+	int temp_num = (inode_num-1) / 128; 
+	int mapping_block = MAPPING_BLOCK_START + temp_num;    //(block 9 - 24)
 
-	char* buffer6 =(char*)calloc(BLOCK_SIZE, 1);
+	char* buffer6 = (char*)calloc(BLOCK_SIZE, 1);
 	readBlock(disk, mapping_block, buffer6, BLOCK_SIZE);
 	
 	int clear_inode_block_num = 0;
@@ -254,7 +254,7 @@ void create_single_indirect(FILE* disk, short* file_block_num_array, int size_of
 	read_free_block_vector(disk , &free_block_num4);
 	fill_free_block_vector(disk , free_block_num4);	
 	
-	char* single_indir_content =(char*)calloc(BLOCK_SIZE, 1);
+	char* single_indir_content = (char*)calloc(BLOCK_SIZE, 1);
 	
 	for(int i = 10 ; i < size_of_array ; i++){
 		memcpy(single_indir_content+((i-10)*2), &file_block_num_array[i] , 2);
@@ -262,7 +262,7 @@ void create_single_indirect(FILE* disk, short* file_block_num_array, int size_of
 
 	writeBlock(disk, free_block_num4, single_indir_content, BLOCK_SIZE);
 
-	short temp	=(short) free_block_num4; 
+	short temp	= (short) free_block_num4; 
 	
 	memcpy(single_indirect_block_num, &temp, 2);
 }
@@ -271,7 +271,7 @@ void create_single_indirect(FILE* disk, short* file_block_num_array, int size_of
 
 void translate_indirect_to_size(FILE* disk, short indirect_block_num, short* result_size){		
 
-	char* buffer =(char*)calloc(BLOCK_SIZE, 1);
+	char* buffer = (char*)calloc(BLOCK_SIZE, 1);
     readBlock(disk, indirect_block_num, buffer, BLOCK_SIZE);
 	
 	short temp_size = 0;
@@ -292,7 +292,7 @@ void translate_indirect_to_size(FILE* disk, short indirect_block_num, short* res
 
 void translate_indirect_to_array(FILE* disk, short indirect_block_num, short* result_block_num, short array_size){		
 
-	char* buffer =(char*)calloc(BLOCK_SIZE, 1);
+	char* buffer = (char*)calloc(BLOCK_SIZE, 1);
     readBlock(disk, indirect_block_num, buffer, BLOCK_SIZE);
 	
 	for(int i = 10 ; i < array_size; i++){
@@ -376,7 +376,7 @@ void create_file_single_inode(FILE* disk, int free_block_num, int dir_block_num)
 		memcpy(inode+8+(i*2), &dataBlock[i], 2);
 	}
 
-    short dataBlock_0	=(short) dir_block_num;       // the block for this directory
+    short dataBlock_0	= (short) dir_block_num;       // the block for this directory
 	
 	memcpy(inode, &size_of_file, 4);
 	memcpy(inode+4, &flags, 4);
@@ -399,7 +399,7 @@ void create_directory_inode(FILE* disk, int free_block_num, int dir_block_num){
 		memcpy(inode+8+(i*2), &dataBlock[i], 2);
 	}
 
-    short dataBlock_0	=(short) dir_block_num;       // the block for this directory
+    short dataBlock_0	= (short) dir_block_num;       // the block for this directory
 	
 	memcpy(inode, &size_of_file, 4);
 	memcpy(inode+4, &flags, 4);
@@ -412,7 +412,7 @@ void create_directory_inode(FILE* disk, int free_block_num, int dir_block_num){
 
 void read_inode(FILE* disk, int inode_block_num, short* result_block_num){		// we should get back an array of block num
 
-	char* buffer =(char*)calloc(32, 1);
+	char* buffer = (char*)calloc(32, 1);
     readBlock(disk, inode_block_num, buffer, 32);
 
 	for(int i = 0 ; i < 12 ; i++){
@@ -423,7 +423,7 @@ void read_inode(FILE* disk, int inode_block_num, short* result_block_num){		// w
 
 void create_directory_block(FILE* disk, int free_block_num2){
 	
-	char* data =(char*)calloc(BLOCK_SIZE, 1);
+	char* data = (char*)calloc(BLOCK_SIZE, 1);
 	//char file_name[] = "file_name_testing";
 	//unsigned char inode_number;
 	//memcpy(data, &inode_number, 1);
@@ -457,7 +457,7 @@ void extend_parent_dir_block(FILE* disk, int parent_dir_node_block_num, int* new
 		}
 	}
 	
-	result_block_num[latest_datablock+1] =(short) free_block_num3;
+	result_block_num[latest_datablock+1] = (short) free_block_num3;
 
 	char* inode = calloc(32, 1);
     readBlock(disk, parent_dir_node_block_num, inode, 32);				
@@ -481,7 +481,7 @@ void edit_parent_dir_block(FILE* disk, int parent_dir_node_block_num, int child_
 	}
 	//printf("\n\n\n\n   *****latest_datablock: %d   \n\n\n\n", latest_datablock);  
 	
-	char* buffer7 =(char*)calloc(BLOCK_SIZE, 1);	
+	char* buffer7 = (char*)calloc(BLOCK_SIZE, 1);	
 	readBlock(disk, result_block_num[latest_datablock], buffer7, BLOCK_SIZE);  
 
 	int entry_num = -1; 
@@ -491,7 +491,7 @@ void edit_parent_dir_block(FILE* disk, int parent_dir_node_block_num, int child_
 		unsigned char temp_inode_number; 
 		memcpy(&temp_inode_number, buffer7 +(i*32), 1); 
 		
-		int temp_inode_number2 =(int) temp_inode_number; 
+		int temp_inode_number2 = (int) temp_inode_number; 
 
 		if(temp_inode_number2 == 0){
 			entry_num = i;
@@ -505,7 +505,7 @@ void edit_parent_dir_block(FILE* disk, int parent_dir_node_block_num, int child_
 		int new_block_num;
 		extend_parent_dir_block(disk, parent_dir_node_block_num, &new_block_num);	// create new block+link it up to parent inode
 		
-		unsigned char inode_number =(char) child_dir_inode_num;
+		unsigned char inode_number = (char) child_dir_inode_num;
 
 		memcpy(buffer7 +(entry_num*32), &inode_number, 1);			//child_dir_inode_num = new build dir inode#
 		strncpy(buffer7 +(entry_num*32) +1, child_dir_name, 31);
@@ -514,7 +514,7 @@ void edit_parent_dir_block(FILE* disk, int parent_dir_node_block_num, int child_
 	}
 	
 	else{
-		unsigned char inode_number =(char) child_dir_inode_num;
+		unsigned char inode_number = (char) child_dir_inode_num;
 
 		memcpy(buffer7 +(entry_num*32), &inode_number, 1);
 		strncpy(buffer7 +(entry_num*32) +1, child_dir_name, 31);
@@ -529,7 +529,7 @@ void edit_parent_dir_block(FILE* disk, int parent_dir_node_block_num, int child_
 
 void del_entry_dir_block(FILE* disk, int parent_dir_block_num, int del_file_inode_num){
 	
-	char* buffer7 =(char*)calloc(BLOCK_SIZE, 1);	
+	char* buffer7 = (char*)calloc(BLOCK_SIZE, 1);	
 	readBlock(disk, parent_dir_block_num, buffer7, BLOCK_SIZE);
 
 	int entry_num = -1;
@@ -539,7 +539,7 @@ void del_entry_dir_block(FILE* disk, int parent_dir_block_num, int del_file_inod
 		unsigned char temp_inode_number;
 		memcpy(&temp_inode_number, buffer7 +(i*32), 1);
 		
-		int temp_inode_number2 =(int) temp_inode_number;
+		int temp_inode_number2 = (int) temp_inode_number;
 		//printf("*****testing: %d\n", temp_inode_number2);
 		
 		if(temp_inode_number2 == del_file_inode_num){
@@ -548,7 +548,7 @@ void del_entry_dir_block(FILE* disk, int parent_dir_block_num, int del_file_inod
 	}
 	//printf("*****testing deleteing_entry_num: %d\n", entry_num);
 
-	char* temp_entry_buffer =(char*)calloc(32, 1);	
+	char* temp_entry_buffer = (char*)calloc(32, 1);	
 	memcpy(buffer7 +(entry_num*32), temp_entry_buffer, 32);
 	writeBlock(disk, parent_dir_block_num , buffer7, BLOCK_SIZE);
 	
@@ -561,12 +561,12 @@ void search_file_or_dir(FILE* disk, int dir_block_num, char* file_name, int* fin
 
 	int entry_num = -1;
 
-	char* buffer3 =(char*)calloc(BLOCK_SIZE, 1);
+	char* buffer3 = (char*)calloc(BLOCK_SIZE, 1);
 	readBlock(disk, dir_block_num, buffer3, BLOCK_SIZE);
 	
 	for(int i = 0 ;(i < 16)&&(entry_num == -1) ; i++){
 
-		char* buffer4 =(char*)calloc(31, 1);	
+		char* buffer4 = (char*)calloc(31, 1);	
 		strncpy(buffer4, buffer3 +(i*32) + 1 , 30);
 
 		if(strncmp(buffer4, file_name , 30) == 0){
@@ -582,7 +582,7 @@ void search_file_or_dir(FILE* disk, int dir_block_num, char* file_name, int* fin
 		unsigned char temp_inode_num_hello;
 		memcpy(&temp_inode_num_hello, buffer3 +(entry_num*32), 1);
 
-		int temp_inode_num_hello2 =(int) temp_inode_num_hello;
+		int temp_inode_num_hello2 = (int) temp_inode_num_hello;
 		//printf("***********checking for inode#: %d\n", temp_inode_num_hello2);
 		memcpy(finding_inode_num, &temp_inode_num_hello2, 4);
 	
@@ -623,7 +623,7 @@ void create_root(FILE* disk){
 	
 	add_mapping(disk, next_free_inode_index2, free_block_num);	// root dir inode = #1, (#01, block #25)
 	
-	root_inode_index = next_free_inode_index2;
+	ROOT_INODE_INDEX = next_free_inode_index2;
 	update_superblock(disk);
 }
 
@@ -634,7 +634,7 @@ void initLLFS(FILE* disk){
 	//fwrite(init, BLOCK_SIZE*NUM_BLOCKS, 1, disk);
 	//free(init);
 	
-	create_superblock(disk);
+	createSuperblock(disk);
 	create_free_block_vector(disk);
 	create_root(disk);
 
@@ -682,7 +682,7 @@ void create_file(FILE* disk, char* file_content, int parent_dir_inode_num, char*
 	if(strlen(file_content) < 512){
 
 		int free_block_num4;											// block for file content
-		char* file_content_buffer =(char*)calloc(BLOCK_SIZE, 1);
+		char* file_content_buffer = (char*)calloc(BLOCK_SIZE, 1);
 		
 		strncpy(file_content_buffer, file_content, strlen(file_content));
 		//printf("testing file_content: %s\n", file_content_buffer);
@@ -721,9 +721,9 @@ void create_file(FILE* disk, char* file_content, int parent_dir_inode_num, char*
 		int block_needed;
 		
 		if((strlen(file_content) % 512) != 0){						// case: if doesnt fill whole block
-			block_needed =(strlen(file_content))/512+1 ;
+			block_needed = (strlen(file_content))/512+1 ;
 		}else{
-			block_needed =(strlen(file_content))/512 ;
+			block_needed = (strlen(file_content))/512 ;
 		}
 			
 		short store_block_array[ block_needed ];
@@ -733,14 +733,14 @@ void create_file(FILE* disk, char* file_content, int parent_dir_inode_num, char*
 
 			int free_block_num4;									// block for file content
 			
-			char* file_content_buffer =(char*)calloc(BLOCK_SIZE, 1);
+			char* file_content_buffer = (char*)calloc(BLOCK_SIZE, 1);
 			strncpy(file_content_buffer, file_content +(i*512) , 512);
 
 			read_free_block_vector(disk , &free_block_num4);
 			create_file_block(disk, free_block_num4, file_content_buffer);
 			fill_free_block_vector(disk , free_block_num4);
 
-			store_block_array[i] =(short) free_block_num4;
+			store_block_array[i] = (short) free_block_num4;
 
 			//printf("\ntesting store_block_array %d: %d\n", i,  store_block_array[i]);
 		}
@@ -778,7 +778,7 @@ void create_file(FILE* disk, char* file_content, int parent_dir_inode_num, char*
 void create_empty_file(FILE* disk, int parent_dir_inode_num, char* file_name){
 
 		int free_block_num4;											// block for file content
-		char* file_content_buffer =(char*)calloc(BLOCK_SIZE, 1);
+		char* file_content_buffer = (char*)calloc(BLOCK_SIZE, 1);
 		
 		read_free_block_vector(disk , &free_block_num4);
 		create_file_block(disk, free_block_num4, file_content_buffer);
@@ -814,9 +814,9 @@ void create_empty_file(FILE* disk, int parent_dir_inode_num, char* file_name){
 
 void open_file(FILE* disk, char* input){
 
-	char* parent_directory_name =(char*)calloc(31,1);	
-	char* curr_file_name =(char*)calloc(31,1);	
-	char* fake_curr_file_name =(char*)calloc(31,1);	
+	char* parent_directory_name = (char*)calloc(31,1);	
+	char* curr_file_name = (char*)calloc(31,1);	
+	char* fake_curr_file_name = (char*)calloc(31,1);	
 	
 	const char s[2] = "/";
 
@@ -829,9 +829,9 @@ void open_file(FILE* disk, char* input){
 	
 	int saved_parent_inode_block_num = -1;
 	
-		int newest_root_inode_index = get_root_inode_index(disk);
+		int newest_ROOT_INODE_INDEX = get_ROOT_INODE_INDEX(disk);
 			
-		int root_inode_block_num = find_mapping(disk, newest_root_inode_index);
+		int root_inode_block_num = find_mapping(disk, newest_ROOT_INODE_INDEX);
 
 		short result_block_num4[12];
 		read_inode(disk, root_inode_block_num, result_block_num4);
@@ -894,7 +894,7 @@ void open_file(FILE* disk, char* input){
 				
 				for(int i = 0 ;(result_block_num5[i] != -1) &&(i<result_size) ; i++){
 					
-					char* buffer =(char*)calloc(BLOCK_SIZE,1);	
+					char* buffer = (char*)calloc(BLOCK_SIZE,1);	
 					readBlock(disk,(int)result_block_num5[i], buffer, BLOCK_SIZE);
 					printf("%s", buffer);
 						
@@ -907,7 +907,7 @@ void open_file(FILE* disk, char* input){
 				
 				for(int i = 0 ;(result_block_num[i] != -1) &&(i<10) ; i++){
 					
-					char* buffer =(char*)calloc(BLOCK_SIZE,1);	
+					char* buffer = (char*)calloc(BLOCK_SIZE,1);	
 					readBlock(disk,(int)result_block_num[i], buffer, BLOCK_SIZE);
 					printf("%s", buffer);
 						
@@ -948,9 +948,9 @@ void open_file(FILE* disk, char* input){
 
 void make_directory(FILE* disk, char* input){
 	
-	char* parent_directory_name =(char*)calloc(31,1);	
-	char* curr_dir_name =(char*)calloc(31,1);	
-	char* fake_curr_dir_name =(char*)calloc(31,1);	
+	char* parent_directory_name = (char*)calloc(31,1);	
+	char* curr_dir_name = (char*)calloc(31,1);	
+	char* fake_curr_dir_name = (char*)calloc(31,1);	
 	
 	const char s[2] = "/";
 
@@ -963,9 +963,9 @@ void make_directory(FILE* disk, char* input){
 	
 	int saved_parent_inode_block_num = -1;
 	
-	int newest_root_inode_index = get_root_inode_index(disk);
+	int newest_ROOT_INODE_INDEX = get_ROOT_INODE_INDEX(disk);
 		
-	int root_inode_block_num = find_mapping(disk, newest_root_inode_index);
+	int root_inode_block_num = find_mapping(disk, newest_ROOT_INODE_INDEX);
 
 	short result_block_num4[12];
 	read_inode(disk, root_inode_block_num, result_block_num4);
@@ -1020,9 +1020,9 @@ void make_directory(FILE* disk, char* input){
 
 void write_file(FILE* disk, char* input, char* file_content_larger){
 	
-	char* parent_directory_name =(char*)calloc(31,1);	
-	char* curr_file_name =(char*)calloc(31,1);	
-	char* fake_curr_dir_name =(char*)calloc(31,1);	
+	char* parent_directory_name = (char*)calloc(31,1);	
+	char* curr_file_name = (char*)calloc(31,1);	
+	char* fake_curr_dir_name = (char*)calloc(31,1);	
 	
 	const char s[2] = "/";
 
@@ -1035,9 +1035,9 @@ void write_file(FILE* disk, char* input, char* file_content_larger){
 	
 	int saved_parent_inode_block_num = -1;
 	
-	int newest_root_inode_index = get_root_inode_index(disk);
+	int newest_ROOT_INODE_INDEX = get_ROOT_INODE_INDEX(disk);
 		
-	int root_inode_block_num = find_mapping(disk, newest_root_inode_index);
+	int root_inode_block_num = find_mapping(disk, newest_ROOT_INODE_INDEX);
 
 	short result_block_num4[12];
 	
@@ -1091,9 +1091,9 @@ void write_file(FILE* disk, char* input, char* file_content_larger){
 
 void write_empty_file(FILE* disk, char* input){
 	
-	char* parent_directory_name =(char*)calloc(31,1);	
-	char* curr_file_name =(char*)calloc(31,1);	
-	char* fake_curr_dir_name =(char*)calloc(31,1);	
+	char* parent_directory_name = (char*)calloc(31,1);	
+	char* curr_file_name = (char*)calloc(31,1);	
+	char* fake_curr_dir_name = (char*)calloc(31,1);	
 	
 	const char s[2] = "/";
 
@@ -1106,9 +1106,9 @@ void write_empty_file(FILE* disk, char* input){
 	
 	int saved_parent_inode_block_num = -1;
 	
-		int newest_root_inode_index = get_root_inode_index(disk);
+		int newest_ROOT_INODE_INDEX = get_ROOT_INODE_INDEX(disk);
 			
-		int root_inode_block_num = find_mapping(disk, newest_root_inode_index);
+		int root_inode_block_num = find_mapping(disk, newest_ROOT_INODE_INDEX);
 
 		short result_block_num4[12];
 		read_inode(disk, root_inode_block_num, result_block_num4);
@@ -1211,9 +1211,9 @@ void delete_directory(FILE* disk, int parent_dir_block_num, char* curr_file_name
 
 void Rm_file(FILE* disk, char* input){
 	
-	char* parent_directory_name =(char*)calloc(31,1);	
-	char* curr_file_name =(char*)calloc(31,1);	
-	char* fake_curr_dir_name =(char*)calloc(31,1);	
+	char* parent_directory_name = (char*)calloc(31,1);	
+	char* curr_file_name = (char*)calloc(31,1);	
+	char* fake_curr_dir_name = (char*)calloc(31,1);	
 	
 	const char s[2] = "/";
 
@@ -1226,9 +1226,9 @@ void Rm_file(FILE* disk, char* input){
 	
 	int saved_parent_inode_block_num = -1;
 	
-		int newest_root_inode_index = get_root_inode_index(disk);
+		int newest_ROOT_INODE_INDEX = get_ROOT_INODE_INDEX(disk);
 			
-		int root_inode_block_num = find_mapping(disk, newest_root_inode_index);
+		int root_inode_block_num = find_mapping(disk, newest_ROOT_INODE_INDEX);
 
 		short result_block_num4[12];
 		read_inode(disk, root_inode_block_num, result_block_num4);
@@ -1302,9 +1302,9 @@ void list_file(FILE* disk, char* input){
 	
 	//printf("****************************%s \n", input);
 	
-	char* parent_directory_name =(char*)calloc(31,1);	
-	char* curr_dir_name =(char*)calloc(31,1);	
-	char* fake_curr_dir_name =(char*)calloc(31,1);	
+	char* parent_directory_name = (char*)calloc(31,1);	
+	char* curr_dir_name = (char*)calloc(31,1);	
+	char* fake_curr_dir_name = (char*)calloc(31,1);	
 	
 	const char s[2] = "/";
 
@@ -1317,9 +1317,9 @@ void list_file(FILE* disk, char* input){
 
 	int saved_parent_inode_block_num = -1;
 	
-		int newest_root_inode_index = get_root_inode_index(disk);
+		int newest_ROOT_INODE_INDEX = get_ROOT_INODE_INDEX(disk);
 	
-		int root_inode_block_num = find_mapping(disk, newest_root_inode_index);
+		int root_inode_block_num = find_mapping(disk, newest_ROOT_INODE_INDEX);
 
 		short result_block_num4[12];
 		read_inode(disk, root_inode_block_num, result_block_num4);
@@ -1337,12 +1337,12 @@ void list_file(FILE* disk, char* input){
 				for(int i = 0 ;(result_block_num[i] != -1) &&(i<10) ; i++){
 
 					short inode_num_empty = 0;
-					char* buffer3 =(char*)calloc(BLOCK_SIZE, 1);
+					char* buffer3 = (char*)calloc(BLOCK_SIZE, 1);
 					readBlock(disk, result_block_num[i], buffer3, BLOCK_SIZE);
 
 					for(int i = 0 ; i < 16 ; i++){
 
-						char* buffer4 =(char*)calloc(31, 1);
+						char* buffer4 = (char*)calloc(31, 1);
 						
 						strncpy(buffer4, buffer3 +(i*32) + 1 , 31);
 						memcpy(&inode_num_empty, buffer3 +(i*32), 1);
@@ -1399,12 +1399,12 @@ void list_file(FILE* disk, char* input){
 			for(int i = 0 ;(result_block_num[i] != -1) &&(i<10) ; i++){
 
 				short inode_num_empty = 0;
-				char* buffer3 =(char*)calloc(BLOCK_SIZE, 1);
+				char* buffer3 = (char*)calloc(BLOCK_SIZE, 1);
 				readBlock(disk, result_block_num[i], buffer3, BLOCK_SIZE);
 
 				for(int i = 0 ; i < 16 ; i++){
 
-					char* buffer4 =(char*)calloc(31, 1);
+					char* buffer4 = (char*)calloc(31, 1);
 					
 					strncpy(buffer4, buffer3 +(i*32) + 1 , 31);
 					memcpy(&inode_num_empty, buffer3 +(i*32), 1);
@@ -1452,9 +1452,9 @@ void list_file(FILE* disk, char* input){
 
 void Rm_dir(FILE* disk, char* input){
 	
-	char* parent_directory_name =(char*)calloc(31,1);	
-	char* curr_dir_name =(char*)calloc(31,1);	
-	char* fake_curr_dir_name =(char*)calloc(31,1);	
+	char* parent_directory_name = (char*)calloc(31,1);	
+	char* curr_dir_name = (char*)calloc(31,1);	
+	char* fake_curr_dir_name = (char*)calloc(31,1);	
 	
 	const char s[2] = "/";
 	
@@ -1467,9 +1467,9 @@ void Rm_dir(FILE* disk, char* input){
 
 	int saved_parent_inode_block_num = -1;
 	
-		int newest_root_inode_index = get_root_inode_index(disk);
+		int newest_ROOT_INODE_INDEX = get_ROOT_INODE_INDEX(disk);
 			
-		int root_inode_block_num = find_mapping(disk, newest_root_inode_index);
+		int root_inode_block_num = find_mapping(disk, newest_ROOT_INODE_INDEX);
 
 		short result_block_num4[12];
 		read_inode(disk, root_inode_block_num, result_block_num4);
@@ -1543,13 +1543,13 @@ void command_input(FILE* disk, char* input, char* file_content_larger){
 
 	char tok_string7[10];
 	strncpy(tok_string7, input, 6);
-	char* command7 =(char*)calloc(60,1);	
+	char* command7 = (char*)calloc(60,1);	
 	char s[2] = "/";
 	command7 = strtok(tok_string7, s);		// skip the first command "open"
 	
-	char* input2 =(char*)calloc(60,1);
+	char* input2 = (char*)calloc(60,1);
 	strncpy(input2, input, 60);
-	char* path =(char*)calloc(60,1);
+	char* path = (char*)calloc(60,1);
 	path = strtok(input2, "/");
 	path = strtok(NULL, "");
 	
