@@ -63,7 +63,7 @@ FILE* disk;
 	
 	//test case: "Writefile /home/dir1/dir2/helloworldmk2" and the content is "hello world hello world"
 	
-	char input7[] = "Writefile //home/dir1/dir2/helloworldmk2";
+	char input7[] = "Writefile /home/dir1/dir2/helloworldmk2";
 	char fileContent2[] = "hello world hello world";
 	commandInput (disk, input7, fileContent2);
 	
