@@ -451,44 +451,30 @@ void deleteEntryDirectoryBlock(FILE* disk, int parentDirectoryNode, int deleteFi
 
 
 
-void search_file_or_dir(FILE* disk, int dir_block_num, char* file_name, int* finding_inode_num){
-
-	int entry_num = -1;
-
-	char* buffer3 = (char*)calloc(BLOCK_SIZE, 1);
-	readBlock(disk, dir_block_num, buffer3, BLOCK_SIZE);
+void searchFileOrDirectory(FILE* disk, int directoryBlockNumber, char* fileName, int* findingInodeNumber){
+	int entryNumber = -1;
+	char* buffer = (char*)calloc(BLOCK_SIZE, 1);
+	readBlock(disk, directoryBlockNumber, buffer, BLOCK_SIZE);
 	
-	for(int i = 0;(i < 16)&&(entry_num == -1); i++){
-
-		char* buffer4 = (char*)calloc(31, 1);	
-		strncpy(buffer4, buffer3 +(i*32) + 1, 30);
-
-		if(strncmp(buffer4, file_name, 30) == 0){
-			
-			entry_num = i;
-			//printf("@@@@@@@@@ matching entry_num: %d\n", entry_num);
+	for(int i = 0;(i < 16)&&(entryNumber == -1); i++){
+		char* buffer2 = (char*)calloc(31, 1);	
+		strncpy(buffer2, buffer +(i*32) + 1, 30);
+		if(strncmp(buffer2, fileName, 30) == 0){
+			entryNumber = i;
 		}
-		free(buffer4); 
+		free(buffer2); 
 	}
 	
-	if(entry_num != -1){
-		
-		unsigned char temp_inode_num_hello;
-		memcpy(&temp_inode_num_hello, buffer3 +(entry_num*32), 1);
-
-		int temp_inode_num_hello2 = (int) temp_inode_num_hello;
-		//printf("***********checking for inode#: %d\n", temp_inode_num_hello2);
-		memcpy(finding_inode_num, &temp_inode_num_hello2, 4);
-	
+	if(entryNumber != -1){
+		unsigned char temp;
+		memcpy(&temp, buffer +(entryNumber*32), 1);
+		int temp2 = (int) temp;
+		memcpy(findingInodeNumber, &temp2, 4);
 	} else {
-		
-		int temp_inode_num_hello2 = -1;
-		//printf("\n\n      no such directory or file in this datablock: '%s'   \n\n", file_name);
-		memcpy(finding_inode_num, &temp_inode_num_hello2, 4);
+		int temp2 = -1;
+		memcpy(findingInodeNum, &temp2, 4);
 	}
-	
-	free(buffer3);
-	
+	free(buffer);
 }
 
 
@@ -750,7 +736,7 @@ void open_file(FILE* disk, char* input){
 			
 			for(int i = 0; result_block_num3[i] != -1; i++){
 			
-				search_file_or_dir(disk, result_block_num3[i], curr_file_name, &checking_inode_num);
+				searchFileOrDirectory(disk, result_block_num3[i], curr_file_name, &checking_inode_num);
 				
 				if(checking_inode_num > 0){
 					
@@ -820,7 +806,7 @@ void open_file(FILE* disk, char* input){
 			
 			for(int i = 0; result_block_num[i] != -1; i++){
 			
-				search_file_or_dir(disk, result_block_num[i], curr_file_name, &checking_inode_num);
+				searchFileOrDirectory(disk, result_block_num[i], curr_file_name, &checking_inode_num);
 				
 				if(checking_inode_num > 0){
 					
@@ -890,7 +876,7 @@ void make_directory(FILE* disk, char* input){
 			
 			for(int i = 0; result_block_num[i] != -1; i++){
 			
-				search_file_or_dir(disk, result_block_num[i], curr_dir_name, &checking_inode_num);
+				searchFileOrDirectory(disk, result_block_num[i], curr_dir_name, &checking_inode_num);
 				
 				if(checking_inode_num > 0){
 					
@@ -962,7 +948,7 @@ void write_file(FILE* disk, char* input, char* file_content_larger){
 			
 			for(int i = 0; result_block_num[i] != -1; i++){
 			
-				search_file_or_dir(disk, result_block_num[i], curr_file_name, &checking_inode_num);
+				searchFileOrDirectory(disk, result_block_num[i], curr_file_name, &checking_inode_num);
 				
 				if(checking_inode_num > 0){
 					
@@ -1032,7 +1018,7 @@ void write_empty_file(FILE* disk, char* input){
 			
 			for(int i = 0; result_block_num[i] != -1; i++){
 			
-				search_file_or_dir(disk, result_block_num[i], curr_file_name, &checking_inode_num);
+				searchFileOrDirectory(disk, result_block_num[i], curr_file_name, &checking_inode_num);
 				
 				if(checking_inode_num > 0){
 					
@@ -1147,7 +1133,7 @@ void Rm_file(FILE* disk, char* input){
 			
 			for(int i = 0;(result_block_num[i] != -1) &&(checking_inode_num == -1); i++){
 			
-				search_file_or_dir(disk, result_block_num[i], curr_file_name, &checking_inode_num);
+				searchFileOrDirectory(disk, result_block_num[i], curr_file_name, &checking_inode_num);
 				
 				if(checking_inode_num != -1){
 				
@@ -1173,7 +1159,7 @@ void Rm_file(FILE* disk, char* input){
 			
 			for(int i = 0; result_block_num[i] != -1; i++){
 			
-				search_file_or_dir(disk, result_block_num[i], curr_file_name, &checking_inode_num);
+				searchFileOrDirectory(disk, result_block_num[i], curr_file_name, &checking_inode_num);
 				
 				if(checking_inode_num > 0){
 					
@@ -1271,7 +1257,7 @@ void list_file(FILE* disk, char* input){
 			
 			for(int i = 0; result_block_num3[i] != -1; i++){
 			
-				search_file_or_dir(disk, result_block_num3[i], curr_dir_name, &checking_inode_num);
+				searchFileOrDirectory(disk, result_block_num3[i], curr_dir_name, &checking_inode_num);
 				
 				if(checking_inode_num > 0){
 					
@@ -1323,7 +1309,7 @@ void list_file(FILE* disk, char* input){
 			
 			for(int i = 0; result_block_num[i] != -1; i++){
 			
-				search_file_or_dir(disk, result_block_num[i], curr_dir_name, &checking_inode_num);
+				searchFileOrDirectory(disk, result_block_num[i], curr_dir_name, &checking_inode_num);
 				
 				if(checking_inode_num > 0){
 					
@@ -1389,7 +1375,7 @@ void Rm_dir(FILE* disk, char* input){
 			
 			for(int i = 0;(result_block_num[i] != -1) &&(checking_inode_num == -1); i++){
 			
-				search_file_or_dir(disk, result_block_num[i], curr_dir_name, &checking_inode_num);
+				searchFileOrDirectory(disk, result_block_num[i], curr_dir_name, &checking_inode_num);
 				
 				if(checking_inode_num != -1){
 				
@@ -1414,7 +1400,7 @@ void Rm_dir(FILE* disk, char* input){
 			
 			for(int i = 0; result_block_num[i] != -1; i++){
 			
-				search_file_or_dir(disk, result_block_num[i], curr_dir_name, &checking_inode_num);
+				searchFileOrDirectory(disk, result_block_num[i], curr_dir_name, &checking_inode_num);
 				
 				if(checking_inode_num > 0){
 					
