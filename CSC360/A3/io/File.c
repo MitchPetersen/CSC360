@@ -737,76 +737,59 @@ void openFile(FILE* disk, char* input){
 	free(fakeCurrentFileName);	
 }
 
-void make_directory(FILE* disk, char* input){
-	
-	char* parent_directory_name = (char*)calloc(31,1);	
-	char* curr_dir_name = (char*)calloc(31,1);	
-	char* fake_curr_dir_name = (char*)calloc(31,1);	
-	
+
+void makeDirectory(FILE* disk, char* input){
+	char* parentDirectoryName = (char*)calloc(31,1);	
+	char* currentDirectoryName = (char*)calloc(31,1);	
+	char* fakeCurrentDirectoryName = (char*)calloc(31,1);	
 	const char s[2] = "/";
-
-	fake_curr_dir_name = strtok(input, s);		// skip "Mkdir"
-
-	strncpy(parent_directory_name, curr_dir_name, 31);
-	strncpy(curr_dir_name, fake_curr_dir_name, 31);
 	
-	fake_curr_dir_name = strtok(NULL, s);
+	fakeCurrentDirectoryName = strtok(input, s);		// skip "Mkdir"
+	strncpy(parentDirectoryName, currentDirectoryName, 31);
+	strncpy(currentDirectoryName, fakeCurrentDirectoryName, 31);
+	fakeCurrentDirectoryName = strtok(NULL, s);
 	
-	int saved_parent_inode_block_num = -1;
+	int savedParentInodeBlock = -1;
+	int newestROOTINODEINDEX = getRootInodeIndex(disk);
+	int rootInodeBlockNum = findMapping(disk, newestROOTINODEINDEX);
+	short resultBlock[12];
 	
-	int newest_ROOT_INODE_INDEX = getRootInodeIndex(disk);
-		
-	int root_inode_block_num = findMapping(disk, newest_ROOT_INODE_INDEX);
-
-	short result_block_num4[12];
-	readInode(disk, root_inode_block_num, result_block_num4);
-		
-	saved_parent_inode_block_num = root_inode_block_num;
+	readInode(disk, rootInodeBlockNum, resultBlock);
+	savedParentInodeBlock = rootInodeBlockNum;
 	
-	while(fake_curr_dir_name != NULL) {
+	while(fakeCurrentDirectoryName != NULL) {
+		strncpy(parentDirectoryName, currentDirectoryName, 31);
+		strncpy(currentDirectoryName, fakeCurrentDirectoryName, 31);
+		fakeCurrentDirectoryName = strtok(NULL, s);
+		printf("currentDirectoryName: %s ", currentDirectoryName);
+		printf("parentDirectoryName: %s\n", parentDirectoryName);
 
-		strncpy(parent_directory_name, curr_dir_name, 31);
-		strncpy(curr_dir_name, fake_curr_dir_name, 31);
-		fake_curr_dir_name = strtok(NULL, s);
-		printf("curr_dir_name: %s ", curr_dir_name);
-		printf("parent_directory_name: %s\n", parent_directory_name);
-
-		if(fake_curr_dir_name == NULL){
-
-			create_sub_directory(disk, saved_parent_inode_block_num, curr_dir_name);
-
-			printf("\n       $$$$$$$$$$$$$$ we added a sub directory: %s\n\n", curr_dir_name);
-			
-		}
-		else{
-
+		if(fakeCurrentDirectoryName == NULL){
+			create_sub_directory(disk, savedParentInodeBlock, currentDirectoryName);
+			printf("\n	#We added a sub directory: %s\n", currentDirectoryName);
+		} else {
 			int checking_inode_num;		
 			short result_block_num[12];
-	
-			readInode(disk, saved_parent_inode_block_num, result_block_num);
+			readInode(disk, savedParentInodeBlock, result_block_num);
 			
 			for(int i = 0; result_block_num[i] != -1; i++){
-			
-				searchFileOrDirectory(disk, result_block_num[i], curr_dir_name, &checking_inode_num);
+				searchFileOrDirectory(disk, result_block_num[i], currentDirectoryName, &checking_inode_num);
 				
 				if(checking_inode_num > 0){
-					
-					saved_parent_inode_block_num = findMapping(disk, checking_inode_num);
+					savedParentInodeBlock = findMapping(disk, checking_inode_num);
 				}
 			}
 			
 			if(checking_inode_num < 1){
-				printf("\n      no such directory in this datablock: '%s'   \n", curr_dir_name);
+				printf("\n	No such directory in this datablock: '%s'\n", currentDirectoryName);
 				break;
 			}
 		}
 	}
 	free(parent_directory_name);
-	free(curr_dir_name);
-	free(fake_curr_dir_name);	
+	free(currentDirectoryName);
+	free(fakeCurrentDirectoryName);	
 }
-
-
 
 
 void write_file(FILE* disk, char* input, char* file_content_larger){
@@ -1389,6 +1372,6 @@ void command_input(FILE* disk, char* input, char* file_content_larger){
 	else if(strncmp(command7, "Mkdir", 5) == 0){		
 		
 		printf("we are making a directory at '%s'", path);
-		make_directory(disk, input);
+		makeDirectory(disk, input);
 	}
 }
