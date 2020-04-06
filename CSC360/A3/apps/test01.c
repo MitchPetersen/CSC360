@@ -20,8 +20,8 @@ FILE* disk;
 		
 		disk = fopen("../disk/vdisk", "wb+"); // Open the file to be written to in binary mode
 	
-		char* init = calloc(BLOCK_SIZE*NUM_BLOCKS, 1);
-		fwrite(init, BLOCK_SIZE*NUM_BLOCKS, 1, disk);
+		char* init = calloc(blockSize*numberBlocks, 1);
+		fwrite(init, blockSize*numberBlocks, 1, disk);
 		free(init);
 	}
 	else {
