@@ -1,13 +1,10 @@
-
-// Ronald Liu V00838627
+// Mitch Petersen V00845204
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
-
 #include "../io/File.c"
-
 
 int main(int argc, char* argv[]) {
 	
