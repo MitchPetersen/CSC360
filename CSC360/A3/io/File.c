@@ -352,11 +352,11 @@ void createDirectoryInode(FILE* disk, int freeBlockNumber, int directBlockNumber
 		memcpy(inode+8+(i*2), &dataBlockArray[i], 2);
 	}
 
-    short dataBlockArray = (short) directBlockNumber;
+    short dataBlock = (short) directBlockNumber;
 	
 	memcpy(inode, &fileSize, 4);
 	memcpy(inode+4, &flags, 4);
-	memcpy(inode+8, &dataBlockArray, 2);
+	memcpy(inode+8, &dataBlock, 2);
 
 	writeBlock(disk, freeBlockNumber, inode, blockSize);
 	
@@ -528,7 +528,7 @@ void createFileBlock(FILE* disk, int freeBlockNumber, char* fileContent){
 }
 
 
-void create_root(FILE* disk){
+void createRoot(FILE* disk){
 	int freeBlockNumber;
 	readFreeBlockVector(disk, &freeBlockNumber);
 	fillFreeBlockVector(disk, freeBlockNumber);
@@ -562,17 +562,17 @@ void createSubDirectory(FILE* disk, int parentDirectoryBlockNumber, char* childD
 	readFreeBlockVector(disk, &freeBlockNumber);
 	createDirectoryBlock(disk, freeBlockNumber);
 	fillFreeBlockVector(disk, freeBlockNumber);
-
-	int subDirectBlockNumber = freeBlockNumber;    
-	int freeBlockNumber; 
-	readFreeBlockVector(disk, &freeBlockNumber);
-	createDirectoryInode(disk, freeBlockNumber, subDirectBlockNumber);
-	fillFreeBlockVector(disk, freeBlockNumber);
+	int subDirectBlockNumber = freeBlockNumber;  
+	
+	int freeBlockNumber2; 
+	readFreeBlockVector(disk, &freeBlockNumber2);
+	createDirectoryInode(disk, freeBlockNumber2, subDirectBlockNumber);
+	fillFreeBlockVector(disk, freeBlockNumber2);
 	
 	int nextFreeInodeIndex;
 	findNextFreeInode(disk, &nextFreeInodeIndex);
 
-	addMapping(disk, next_freeInodeIndex, freeBlockNumber);
+	addMapping(disk, next_freeInodeIndex, freeBlockNumber2);
 	
 	inodeNum++;
 	updateSuperblock(disk);
