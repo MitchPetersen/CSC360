@@ -606,7 +606,7 @@ void createFile(FILE* disk, char* fileContent, int parentDirectoryInode, char* f
 		int nextFreeInodeIndex;
 		
 		findNextFreeInode(disk, &nextFreeInodeIndex);
-		addMapping(disk, nextFreeInodeIndex, freeBlockNumber3);
+		addMapping(disk, nextFreeInodeIndex, freeBlockNumber2);
 		
 		
 		inodeNum++;
@@ -1213,7 +1213,7 @@ void rmDirectory(FILE* disk, char* input){
 		fakeCurrentDirectoryName = strtok(NULL, s);
 		if(fakeCurrentDirectoryName == NULL){
 			short resultBlockNumber[12];
-			readInode(disk, savedParentInodeBlockNumber, resultBlockNumber){
+			readInode(disk, savedParentInodeBlockNumber, resultBlockNumber);
 			int checkInodeNum = -1;		
 			int fileBlockDirectory;
 			
