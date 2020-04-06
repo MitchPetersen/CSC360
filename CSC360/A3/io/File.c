@@ -478,178 +478,132 @@ void searchFileOrDirectory(FILE* disk, int directoryBlockNumber, char* fileName,
 }
 
 
-void create_file_block(FILE* disk, int free_block_num2, char* file_content_buffer){
-
-	writeBlock(disk, free_block_num2, file_content_buffer, BLOCK_SIZE);
-
+void createFileBlock(FILE* disk, int freeBlock, char* fileContent){
+	writeBlock(disk, freeBlock, fileContent, BLOCK_SIZE);
 }
 
 
-void create_root(FILE* disk){
-	
-	int free_block_num2;
-	readFreeBlockVector(disk, &free_block_num2);
-	fillFreeBlockVector(disk, free_block_num2);
-
-	int root_dir_block_num = free_block_num2;     
-	int free_block_num;
-	readFreeBlockVector(disk, &free_block_num);
-	createDirectoryInode(disk, free_block_num, root_dir_block_num);
-	fillFreeBlockVector(disk, free_block_num);
-	
-	int next_free_inode_index2;
-	findNextFreeInodenum(disk, &next_free_inode_index2);
-	//printf("***********************testing find_next_free_inode #root: %d\n", next_free_inode_index2);
-	
-	addMapping(disk, next_free_inode_index2, free_block_num);	// root dir inode = #1, (#01, block #25)
-	
-	ROOT_INODE_INDEX = next_free_inode_index2;
-	update_superblock(disk);
+void createRoot(FILE* disk){
+	int freeBlockNum;
+	readFreeBlockVector(disk, &freeBlockNum);
+	fillFreeBlockVector(disk, freeBlockNum);
+	int rootDirectoryBlockNumber = freeBlockNum;     
+	int freeBlock;
+	readFreeBlockVector(disk, &freeBlock);
+	createDirectoryInode(disk, freeBlock, rootDirectoryBlockNumber);
+	fillFreeBlockVector(disk, freeBlock);
+	int nextFree;
+	findNextFreeInodenum(disk, &nextFree);
+	addMapping(disk, nextFree, freeBlock);
+	ROOT_INODE_INDEX = nextFree;
+	updateSuperblock(disk);
 }
 
 
 void initLLFS(FILE* disk){
-	
-	//char* init = calloc(BLOCK_SIZE*NUM_BLOCKS, 1);
-	//fwrite(init, BLOCK_SIZE*NUM_BLOCKS, 1, disk);
-	//free(init);
-	
 	createSuperblock(disk);
 	createFreeBlockVector(disk);
-	create_root(disk);
-
+	createRoot(disk);
 	NUM_INODE++;
-	update_superblock(disk);
-	//readSuperblock(disk);
+	updateSuperblock(disk);
 }
 
 
-void create_sub_directory(FILE* disk, int parent_dir_node_block_num, char* child_dir_name){
-	
-	int free_block_num3;
-	readFreeBlockVector(disk, &free_block_num3);
-	createDirectoryBlock(disk, free_block_num3);
-	fillFreeBlockVector(disk, free_block_num3);
-
-	int sub_dir_block_num = free_block_num3;    
-	int free_block_num4; 
-	readFreeBlockVector(disk, &free_block_num4);
-	createDirectoryInode(disk, free_block_num4, sub_dir_block_num);
-	fillFreeBlockVector(disk, free_block_num4);
-	
-	int next_free_inode_index3;
-	findNextFreeInodenum(disk, &next_free_inode_index3);
-	//printf("testing find_next_free_inode #sub: %d\n", next_free_inode_index3);
-
-	addMapping(disk, next_free_inode_index3, free_block_num4);		// sub dir inode = #2, (#02, block #28)
-	
+void create_sub_directory(FILE* disk, int parentDirectoryNode, char* childDirectoryName){
+	int freeBlock;
+	readFreeBlockVector(disk, &freeBlock);
+	createDirectoryBlock(disk, freeBlock);
+	fillFreeBlockVector(disk, freeBlock);
+	int subDirectryBlockNumber = freeBlock;    
+	int freeBlock2; 
+	readFreeBlockVector(disk, &freeBlock2);
+	createDirectoryInode(disk, freeBlock2, subDirectryBlockNumber);
+	fillFreeBlockVector(disk, freeBlock2);
+	int nextFreeInode;
+	findNextFreeInodenum(disk, &nextFreeInode);
+	addMapping(disk, nextFreeInode, freeBlock2);
 	NUM_INODE++;
-	update_superblock(disk);
-	//readSuperblock(disk);
-
-	
-	//modify parent(root)
-	int child_dir_inode_num = next_free_inode_index3;   
-	EditParentDirectoryBlock(disk, parent_dir_node_block_num, child_dir_inode_num, child_dir_name);
+	updateSuperblock(disk);
+	int childDirectoryInode = nextFreeInode;   
+	EditParentDirectoryBlock(disk, parentDirectoryNode, childDirectoryInode, childDirectoryName);
 }
 
 
 
-void create_file(FILE* disk, char* file_content, int parent_dir_inode_num, char* file_name){
-	
-	//printf("\n\n &&&&&&&&&&&&&&&&&&&&&& testing length of file_content: %d\n", strlen(file_content));
-
-	if(strlen(file_content) < 512){
-
-		int free_block_num4;											// block for file content
-		char* file_content_buffer = (char*)calloc(BLOCK_SIZE, 1);
+void createFile(FILE* disk, char* fileContent, int parentDirectoryInode, char* fileName){
+	if(strlen(fileContent) < 512){
+		int freeBlock;
+		char* fileContentBuffer = (char*)calloc(BLOCK_SIZE, 1);
 		
-		strncpy(file_content_buffer, file_content, strlen(file_content));
-		//printf("testing file_content: %s\n", file_content_buffer);
+		strncpy(fileContentBuffer, fileContent, strlen(fileContent));
+		readFreeBlockVector(disk, &freeBlock);
+		createFileBlock(disk, freeBlock, fileContentBuffer);
+		fillFreeBlockVector(disk, freeBlock);
 		
-		readFreeBlockVector(disk, &free_block_num4);
-		create_file_block(disk, free_block_num4, file_content_buffer);
-		fillFreeBlockVector(disk, free_block_num4);
+		int fileBlockNum = freeBlock;   
+		int freeBlock2;
 
+		readFreeBlockVector(disk, &freeBlock2);
+		createFileSingleInode(disk, freeBlock2, fileBlockNum);
+		fillFreeBlockVector(disk, freeBlock2);
 
-		int file_block_num = free_block_num4;   
-		int free_block_num5;											// block for file inode
-
-		readFreeBlockVector(disk, &free_block_num5);
-		createFileSingleInode(disk, free_block_num5, file_block_num);
-		fillFreeBlockVector(disk, free_block_num5);
-
+		int nextFree;
 		
-		int next_free_inode_index4;
-		
-		findNextFreeInodenum(disk, &next_free_inode_index4);
-		addMapping(disk, next_free_inode_index4, free_block_num5);	// file inode = #3
-		
+		findNextFreeInodenum(disk, &nextFree);
+		addMapping(disk, nextFree, freeBlock2);
 		
 		NUM_INODE++;
-		update_superblock(disk);										//update superblock info
-		//readSuperblock(disk);
-		
-		
-		//add to parent inode(into sub directory)
+		updateSuperblock(disk);
 
-		int file_inode_num = next_free_inode_index4;   
-		EditParentDirectoryBlock(disk, parent_dir_inode_num, file_inode_num, file_name);
+		int fileInode = nextFree;   
+		EditParentDirectoryBlock(disk, parentDirectoryInode, fileInode, fileName);
 	}
 	else {
 		
-		int block_needed;
+		int blockNeeded;
 		
-		if((strlen(file_content) % 512) != 0){						// case: if doesnt fill whole block
-			block_needed = (strlen(file_content))/512+1;
+		if((strlen(fileContent) % 512) != 0){
+			blockNeeded = (strlen(fileContent))/512+1;
 		}else{
-			block_needed = (strlen(file_content))/512;
+			blockNeeded = (strlen(fileContent))/512;
 		}
 			
-		short store_block_array[ block_needed ];
-		//printf("\n\n testing block_needed : %d \n\n\n", block_needed);
+		short storeBlockArray[blockNeeded];
 			
-		for(int i = 0; i < block_needed; i++){
+		for(int i = 0; i < blockNeeded; i++){
 
-			int free_block_num4;									// block for file content
+			int freeBlock;
 			
-			char* file_content_buffer = (char*)calloc(BLOCK_SIZE, 1);
-			strncpy(file_content_buffer, file_content +(i*512), 512);
+			char* fileContentBuffer = (char*)calloc(BLOCK_SIZE, 1);
+			strncpy(fileContentBuffer, fileContent +(i*512), 512);
 
-			readFreeBlockVector(disk, &free_block_num4);
-			create_file_block(disk, free_block_num4, file_content_buffer);
-			fillFreeBlockVector(disk, free_block_num4);
+			readFreeBlockVector(disk, &freeBlock);
+			createFileBlock(disk, freeBlock, fileContentBuffer);
+			fillFreeBlockVector(disk, freeBlock);
 
-			store_block_array[i] = (short) free_block_num4;
+			storeBlockArray[i] = (short) freeBlock;
 
-			//printf("\ntesting store_block_array %d: %d\n", i,  store_block_array[i]);
 		}
 
-		int size_of_array = block_needed;
+		int arraySize = blockNeeded;
 		
-		int free_block_num5;			// block for file inode
-		int size_of_file = strlen(file_content);
+		int freeBlock2;
+		int fileSize = strlen(fileContent);
 
-		readFreeBlockVector(disk, &free_block_num5);
-		fillFreeBlockVector(disk, free_block_num5);
-		createFileInode(disk, free_block_num5, store_block_array, size_of_array, size_of_file);
+		readFreeBlockVector(disk, &freeBlock2);
+		fillFreeBlockVector(disk, freeBlock2);
+		createFileInode(disk, freeBlock2, storeBlockArray, arraySize, fileSize);
 
-
-		int next_free_inode_index4;
+		int nextFree;
 		
-		findNextFreeInodenum(disk, &next_free_inode_index4);
-		addMapping(disk, next_free_inode_index4, free_block_num5);	// file inode = #3
+		findNextFreeInodenum(disk, &nextFree);
+		addMapping(disk, nextFree, freeBlock2);
 
-		
 		NUM_INODE++;
-		update_superblock(disk);		//update superblock info
-		//readSuperblock(disk);
-		
-		
-		//add to parent inode(into sub directory)
+		updateSuperblock(disk);
 
-		int file_inode_num = next_free_inode_index4;   
-		EditParentDirectoryBlock(disk, parent_dir_inode_num, file_inode_num, file_name);
+		int fileInodeNum = nextFree;   
+		EditParentDirectoryBlock(disk, parentDirectoryInode, fileInodeNum, fileName);
 	}
 }
 
@@ -661,7 +615,7 @@ void create_empty_file(FILE* disk, int parent_dir_inode_num, char* file_name){
 		char* file_content_buffer = (char*)calloc(BLOCK_SIZE, 1);
 		
 		readFreeBlockVector(disk, &free_block_num4);
-		create_file_block(disk, free_block_num4, file_content_buffer);
+		createFileBlock(disk, free_block_num4, file_content_buffer);
 		fillFreeBlockVector(disk, free_block_num4);
 
 
@@ -680,7 +634,7 @@ void create_empty_file(FILE* disk, int parent_dir_inode_num, char* file_name){
 		
 		
 		NUM_INODE++;
-		update_superblock(disk);										//update superblock info
+		updateSuperblock(disk);										//update superblock info
 		//readSuperblock(disk);
 		
 		
@@ -935,7 +889,7 @@ void write_file(FILE* disk, char* input, char* file_content_larger){
 
 		if(fake_curr_dir_name == NULL){
 			
-			create_file(disk, file_content_larger, saved_parent_inode_block_num, curr_file_name);
+			createFile(disk, file_content_larger, saved_parent_inode_block_num, curr_file_name);
 
 			printf("\n       $$$$$$$$$$$$$$ we added a file, file name: %s\n\n", curr_file_name);
 		}
@@ -1055,7 +1009,7 @@ void delete_file(FILE* disk, int parent_dir_block_num, char* curr_file_name, int
 	
 	deleteFreeBlockVector(disk, del_inode_block_num);
 	NUM_INODE--;
-	update_superblock(disk);
+	updateSuperblock(disk);
 	
 	deleteMapping(disk, del_file_inode_num);
 	
@@ -1081,7 +1035,7 @@ void delete_directory(FILE* disk, int parent_dir_block_num, char* curr_file_name
 	
 	deleteFreeBlockVector(disk, del_inode_block_num);
 	NUM_INODE--;
-	update_superblock(disk);
+	updateSuperblock(disk);
 	
 	deleteMapping(disk, del_dir_inode_num);
 	
