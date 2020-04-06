@@ -1086,12 +1086,12 @@ void listFile(FILE* disk, char* input){
 
 	int saved_parent_inode_block_num = -1;
 	
-		int newest_root_inode_index = get_root_inode_index (disk);
+		int newest_root_inode_index = getRootInodeIndex (disk);
 	
-		int root_inode_block_num = find_mapping(disk, newest_root_inode_index);
+		int root_inode_block_num = findMapping(disk, newest_root_inode_index);
 
 		short result_block_num4[12];
-		read_inode(disk, root_inode_block_num, result_block_num4);
+		readInode(disk, root_inode_block_num, result_block_num4);
 	
 		saved_parent_inode_block_num = root_inode_block_num;
 	
@@ -1099,7 +1099,7 @@ void listFile(FILE* disk, char* input){
 		if (fake_curr_dir_name == NULL){
 
 				short result_block_num[12];
-				read_inode(disk, saved_parent_inode_block_num, result_block_num);	
+				readInode(disk, saved_parent_inode_block_num, result_block_num);	
 
 				printf("\n\n         here is all the file in %s directory: \n\n", curr_dir_name);
 
@@ -1142,15 +1142,15 @@ void listFile(FILE* disk, char* input){
 			int checking_inode_num;		
 			short result_block_num3[12];
 	
-			read_inode(disk, saved_parent_inode_block_num, result_block_num3);
+			readInode(disk, saved_parent_inode_block_num, result_block_num3);
 			
 			for (int i = 0 ; result_block_num3[i] != -1 ; i++){
 			
-				search_file_or_dir(disk, result_block_num3[i], curr_dir_name, &checking_inode_num);
+				searchFileOrDirectory(disk, result_block_num3[i], curr_dir_name, &checking_inode_num);
 				
 				if (checking_inode_num > 0){
 					
-					saved_parent_inode_block_num = find_mapping(disk, checking_inode_num);
+					saved_parent_inode_block_num = findMapping(disk, checking_inode_num);
 				}
 			}
 			if (checking_inode_num < 1){
@@ -1161,7 +1161,7 @@ void listFile(FILE* disk, char* input){
 			//printf("*********************************************************************\n");
 
 			short result_block_num[12];
-			read_inode(disk, saved_parent_inode_block_num, result_block_num);	
+			readInode(disk, saved_parent_inode_block_num, result_block_num);	
 
 			printf("\n\n         here is all the file in %s directory: \n\n", curr_dir_name);
 
@@ -1194,15 +1194,15 @@ void listFile(FILE* disk, char* input){
 			int checking_inode_num;		
 			short result_block_num[12];
 	
-			read_inode(disk, saved_parent_inode_block_num, result_block_num);
+			readInode(disk, saved_parent_inode_block_num, result_block_num);
 			
 			for (int i = 0 ; result_block_num[i] != -1 ; i++){
 			
-				search_file_or_dir(disk, result_block_num[i], curr_dir_name, &checking_inode_num);
+				searchFileOrDirectory(disk, result_block_num[i], curr_dir_name, &checking_inode_num);
 				
 				if (checking_inode_num > 0){
 					
-					saved_parent_inode_block_num = find_mapping(disk, checking_inode_num);
+					saved_parent_inode_block_num = findMapping(disk, checking_inode_num);
 				}
 			}
 			
