@@ -1092,7 +1092,6 @@ void listFile(FILE* disk, char* input){
 	readInode(disk, rootiNodeNumber, resultBlockNumber4);
 
 	savedParentInodeNumber = rootiNodeNumber;
-
 	
 	if (fakeCurrentDirectoryname == NULL){
 
@@ -1188,11 +1187,11 @@ void listFile(FILE* disk, char* input){
 			int inodeCheckNum;		
 			short resultBlockNumber[12];
 	
-			read_inode(disk, savedParentInodeNumber, resultBlockNumber);
+			readInode(disk, savedParentInodeNumber, resultBlockNumber);
 			
 			for (int i = 0 ; resultBlockNumber[i] != -1 ; i++){
 			
-				search_file_or_dir(disk, resultBlockNumber[i], currentDirectoryname, &inodeCheckNum);
+				searchFileOrDirectory(disk, resultBlockNumber[i], currentDirectoryname, &inodeCheckNum);
 				
 				if (inodeCheckNum > 0){
 					
