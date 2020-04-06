@@ -76,8 +76,8 @@ void robustSuperblock(FILE* disk, char* input, int contentLength){
 	char* buffer = (char*)calloc(blockSize, 1);
     readBlock(disk, 0, buffer, blockSize);
 	
-	memcpy( buffer+16, &contentLength, 4);
-	memcpy( buffer+20, input, 60);
+	memcpy(buffer+16, &contentLength, 4);
+	memcpy(buffer+20, input, 60);
 	
 	writeBlock(disk, 0, buffer, blockSize);	
 	free(buffer);
@@ -627,7 +627,7 @@ void createFile(FILE* disk, char* fileContent, int parentDirectoryInode, char* f
 			
 		short store_block_array[ blocksNeeded ];
 			
-		for( int i = 0; i < blocksNeeded; i++){
+		for(int i = 0; i < blocksNeeded; i++){
 			int freeBlockNumber;
 			
 			char* fileContent = (char*)calloc(blockSize, 1);
@@ -1070,119 +1070,148 @@ void rmFile(FILE* disk, char* input){
 
 void listFile(FILE* disk, char* input){
 	char* parentDirectoryName = (char*)calloc(31,1);	
-	char* currentDirectoryName = (char*)calloc(31,1);	
-	char* fakeCurrentDirectoryName = (char*)calloc(31,1);	
+	char* currentDirectoryname = (char*)calloc(31,1);	
+	char* fakeCurrentDirectoryname = (char*)calloc(31,1);	
+	
 	const char s[2] = "/";
 
-	fakeCurrentDirectoryName = strtok(input, s); // skip the first "Mkfile"
-	strncpy(parentDirectoryName, currentDirectoryName, 31);
-	strncpy(currentDirectoryName, fakeCurrentDirectoryName, 31);
-	fakeCurrentDirectoryName = strtok(NULL, s);
+	fakeCurrentDirectoryname = strtok(input, s);		// skip the first command "Mkfile"
 
-	int savedParentInodeBlockNumber = -1;
-	int newestRootInodeIndex = getRootInodeIndex(disk);
-	int rootInodeBlockNumber = findMapping(disk, newestRootInodeIndex);
-	short resultBlockNumber4[12];
+	strncpy(parentDirectoryName, currentDirectoryname, 31);
+	strncpy(currentDirectoryname, fakeCurrentDirectoryname, 31);
 	
-	readInode(disk, rootInodeBlockNumber, resultBlockNumber4);
-	savedParentInodeBlockNumber = rootInodeBlockNumber;
+	fakeCurrentDirectoryname = strtok(NULL, s);
 
-	if(fakeCurrentDirectoryName == NULL){
-			short resultBlockNumber[12];
-			readInode(disk, savedParentInodeBlockNumber, resultBlockNumber);	
+	int saved_parent_inode_block_num = -1;
+	
+		int newest_root_inode_index = get_root_inode_index (disk);
+	
+		int root_inode_block_num = find_mapping(disk, newest_root_inode_index);
 
-			printf("\nHere is all the files in %s directory: \n", currentDirectoryName);
+		short result_block_num4[12];
+		read_inode(disk, root_inode_block_num, result_block_num4);
+	
+		saved_parent_inode_block_num = root_inode_block_num;
+	
+		
+		if (fakeCurrentDirectoryname == NULL){
 
-			for(int i = 0;(resultBlockNumber[i] != -1) &&(i<10); i++){
-				short inodeNum = 0;
-				char* buffer = (char*)calloc(blockSize, 1);
-				readBlock(disk, resultBlockNumber[i], buffer, blockSize);
+				short result_block_num[12];
+				read_inode(disk, saved_parent_inode_block_num, result_block_num);	
 
-				for(int i = 0; i < 16; i++){
-					char* buffer2 = (char*)calloc(31, 1);
-					strncpy(buffer2, buffer +(i*32) + 1, 31);
-					memcpy(&inodeNum, buffer +(i*32), 1);
-					
-					if(inodeNum != 0) {
-						printf("File name %d : %s\n", i, buffer);
+				printf("\n\n         here is all the file in %s directory: \n\n", currentDirectoryname);
+
+				for (int i = 0 ; (result_block_num[i] != -1) && (i<10) ; i++){
+
+					short inode_num_empty = 0;
+					char* buffer3 = (char*)calloc(BLOCK_SIZE, 1);
+					readBlock(disk, result_block_num[i], buffer3, BLOCK_SIZE);
+
+					for (int i = 0 ; i < 16 ; i++){
+
+						char* buffer4 = (char*)calloc(31, 1);
+						
+						strncpy(buffer4, buffer3 + (i*32) + 1 , 31);
+						memcpy (&inode_num_empty, buffer3 + (i*32), 1);
+							
+						if (inode_num_empty != 0) {
+							
+							printf("         #### file name %d : %s\n", i , buffer4);
+						}
+						
+						free(buffer4); 
 					}
-					free(buffer2); 
+					free(buffer3);
 				}
-				free(buffer);
-			}
-			printf("\nWe listed all the files in %s directory\n", currentDirectoryName);
-	}
+				printf("\n       $$$$$$$$$$$$$$ we listed all the file in %s directory \n\n", currentDirectoryname);
+		}
 
-	while(fakeCurrentDirectoryName != NULL) {
 
-		strncpy(parentDirectoryName, currentDirectoryName, 31);
-		strncpy(currentDirectoryName, fakeCurrentDirectoryName, 31);
-		fakeCurrentDirectoryName = strtok(NULL, s);
+	while(fakeCurrentDirectoryname != NULL) {
 
-		if(fakeCurrentDirectoryName == NULL){
-			int checkInodeNum;		
-			short resultBlockNumber2[12];
-			readInode(disk, savedParentInodeBlockNumber, resultBlockNumber2);
+		strncpy(parentDirectoryName, currentDirectoryname, 31);
+		strncpy(currentDirectoryname, fakeCurrentDirectoryname, 31);
+		fakeCurrentDirectoryname = strtok(NULL, s);
+
+		if (fakeCurrentDirectoryname == NULL){
 			
-			for(int i = 0; resultBlockNumber2[i] != -1; i++){
-				searchFileOrDirectory(disk, resultBlockNumber2[i], currentDirectoryName, &checkInodeNum);
-				if(checkInodeNum > 0){
-					savedParentInodeBlockNumber = findMapping(disk, checkInodeNum);
+			int checking_inode_num;		
+			short result_block_num3[12];
+	
+			read_inode(disk, saved_parent_inode_block_num, result_block_num3);
+			
+			for (int i = 0 ; result_block_num3[i] != -1 ; i++){
+			
+				search_file_or_dir(disk, result_block_num3[i], currentDirectoryname, &checking_inode_num);
+				
+				if (checking_inode_num > 0){
+					
+					saved_parent_inode_block_num = find_mapping(disk, checking_inode_num);
 				}
 			}
-			if(checkInodeNum < 1){
-				printf("\nNo such directory in this dataBlockArray: '%s'\n", currentDirectoryName);
+			if (checking_inode_num < 1){
+				printf("\n      no such directory in this datablock: '%s'   \n", currentDirectoryname);
 				break;
 			}
-			
-			short resultBlockNumber[12];
-			readInode(disk, savedParentInodeBlockNumber, resultBlockNumber);	
 
-			printf("\nHere is all the files in %s directory:\n", currentDirectoryName);
+			//printf("*********************************************************************\n");
 
-			for(int i = 0;(resultBlockNumber[i] != -1) &&(i<10); i++){
+			short result_block_num[12];
+			read_inode(disk, saved_parent_inode_block_num, result_block_num);	
 
-				short inodeNum = 0;
-				char* buffer = (char*)calloc(blockSize, 1);
-				readBlock(disk, resultBlockNumber[i], buffer, blockSize);
+			printf("\n\n         here is all the file in %s directory: \n\n", currentDirectoryname);
 
-				for(int i = 0; i < 16; i++){
-					char* buffer2 = (char*)calloc(31, 1);
-					strncpy(buffer2, buffer +(i*32) + 1, 31);
-					memcpy(&inodeNum, buffer +(i*32), 1);
+			for (int i = 0 ; (result_block_num[i] != -1) && (i<10) ; i++){
+
+				short inode_num_empty = 0;
+				char* buffer3 = (char*)calloc(BLOCK_SIZE, 1);
+				readBlock(disk, result_block_num[i], buffer3, BLOCK_SIZE);
+
+				for (int i = 0 ; i < 16 ; i++){
+
+					char* buffer4 = (char*)calloc(31, 1);
+					
+					strncpy(buffer4, buffer3 + (i*32) + 1 , 31);
+					memcpy (&inode_num_empty, buffer3 + (i*32), 1);
 						
-					if(inodeNum != 0) {
+					if (inode_num_empty != 0) {
 						
-						printf("File name %d : %s\n", i, buffer);
+						printf("         #### file name %d : %s\n", i , buffer4);
 					}
 					
-					free(buffer2); 
+					free(buffer4); 
 				}
-				free(buffer);
+				free(buffer3);
 			}
-			printf("\nWe listed all the files in %s directory.\n", currentDirectoryName);
-		} else {
-			int checkInodeNum;		
-			short resultBlockNumber3[12];
-			readInode(disk, savedParentInodeBlockNumber, resultBlockNumber3);
+			printf("\n       $$$$$$$$$$$$$$ we listed all the file in %s directory \n\n", currentDirectoryname);
+		}
+		else{
+
+			int checking_inode_num;		
+			short result_block_num[12];
+	
+			read_inode(disk, saved_parent_inode_block_num, result_block_num);
 			
-			for(int i = 0; resultBlockNumber3[i] != -1; i++){
-				searchFileOrDirectory(disk, resultBlockNumber3[i], currentDirectoryName, &checkInodeNum);
-				if(checkInodeNum > 0){
-					savedParentInodeBlockNumber = findMapping(disk, checkInodeNum);
+			for (int i = 0 ; result_block_num[i] != -1 ; i++){
+			
+				search_file_or_dir(disk, result_block_num[i], currentDirectoryname, &checking_inode_num);
+				
+				if (checking_inode_num > 0){
+					
+					saved_parent_inode_block_num = find_mapping(disk, checking_inode_num);
 				}
 			}
 			
-			if(checkInodeNum < 1){
-				printf("\nNo such directory in this dataBlockArray: '%s'\n", currentDirectoryName);
+			if (checking_inode_num < 1){
+				printf("\n      no such directory in this datablock: '%s'   \n", currentDirectoryname);
 				break;
 			}
 		}
 	}
-	
 	free(parentDirectoryName);
-	free(currentDirectoryName);
-	free(fakeCurrentDirectoryName);	
+	free(currentDirectoryname);
+	free(fakeCurrentDirectoryname);	
+}
 }
 
 
