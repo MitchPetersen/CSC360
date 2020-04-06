@@ -247,28 +247,23 @@ void IndirectToArray(FILE* disk, short indirect_block_num, short* result_block_n
 }
 
 
-void create_file_inode(FILE* disk, int free_block_num, short* file_block_num_array, int size_of_array, int size_of_file){
-
+void createFileInode(FILE* disk, int freeBlock, short* fileBlockNumberArray, int arraySize, int fileSize){
 	char* inode = calloc(BLOCK_SIZE, 1);
-	int flags = 1;   							 // 1 = file, 2 = directory
+	// 1 = file, 2 = directory
+	int flags = 1;
 	short dataBlock[12];
 	
-	for(int i = 0; i < 12; i++){				// initialize each dataBlock[] = -1
+	for(int i = 0; i < 12; i++){
 		dataBlock[i] = -1;
-		memcpy(inode+8+(i*2), &dataBlock[i], 2);
+		memcpy(inode + 8 + (i*2), &dataBlock[i], 2);
 	}
-
-	//printf("\n\n testing file_block_num_array : %d \n\n\n", file_block_num_array[10]);
-	//printf("\n\n testing size_of_array : %d \n\n\n", size_of_array);
 	
-	if(size_of_array < 11){
-		
-		for(int i = 0; i < size_of_array; i++){
-			dataBlock[i] = file_block_num_array[i];
+	if(arraySize < 11){
+		for(int i = 0; i < arraySize; i++){
+			dataBlock[i] = fileBlockNumberArray[i];
 			memcpy(inode+8+(i*2), &dataBlock[i], 2);
 		}
-		
-		memcpy(inode, &size_of_file, 4);
+		memcpy(inode, &fileSize, 4);
 		memcpy(inode+4, &flags, 4);
 		
 		short single_indirect = -1; 
@@ -277,20 +272,16 @@ void create_file_inode(FILE* disk, int free_block_num, short* file_block_num_arr
 		memcpy(inode+28, &single_indirect, 2);
 		memcpy(inode+30, &double_indirect, 2);	
 		
-		writeBlock(disk, free_block_num, inode, BLOCK_SIZE);
-	}
-	else{
-
+		writeBlock(disk, freeBlock, inode, BLOCK_SIZE);
+	} else {
 		for(int i = 0; i < 10; i++){
-			dataBlock[i] = file_block_num_array[i];
+			dataBlock[i] = fileBlockNumberArray[i];
 			memcpy(inode+8+(i*2), &dataBlock[i], 2);
 		}
-
-			short single_indirect_block_num = -1;
-			
-			createSingleIndirect(disk, file_block_num_array, size_of_array, &single_indirect_block_num);
-
-		memcpy(inode, &size_of_file, 4);
+		short single_indirect_block_num = -1;
+		createSingleIndirect(disk, fileBlockNumberArray, arraySize, &single_indirect_block_num);
+		
+		memcpy(inode, &fileSize, 4);
 		memcpy(inode+4, &flags, 4);
 		
 		short single_indirect = single_indirect_block_num; 
@@ -298,9 +289,7 @@ void create_file_inode(FILE* disk, int free_block_num, short* file_block_num_arr
 		
 		memcpy(inode+28, &single_indirect, 2);
 		memcpy(inode+30, &double_indirect, 2);	
-		
-		writeBlock(disk, free_block_num, inode, BLOCK_SIZE);
-		
+		writeBlock(disk, freeBlock, inode, BLOCK_SIZE);
 	}
 	free(inode);
 }
@@ -694,7 +683,7 @@ void create_file(FILE* disk, char* file_content, int parent_dir_inode_num, char*
 
 		readFreeBlockVector(disk, &free_block_num5);
 		fillFreeBlockVector(disk, free_block_num5);
-		create_file_inode(disk, free_block_num5, store_block_array, size_of_array, size_of_file);
+		createFileInode(disk, free_block_num5, store_block_array, size_of_array, size_of_file);
 
 
 		int next_free_inode_index4;
