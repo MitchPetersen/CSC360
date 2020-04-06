@@ -76,8 +76,8 @@ void robustSuperblock(FILE* disk, char* input, int contentLength){
 	char* buffer = (char*)calloc(blockSize, 1);
     readBlock(disk, 0, buffer, blockSize);
 	
-	memcpy( buffer+16, &contentLength, 4 );
-	memcpy( buffer+20, input, 60 );
+	memcpy( buffer+16, &contentLength, 4);
+	memcpy( buffer+20, input, 60);
 	
 	writeBlock(disk, 0, buffer, blockSize);	
 	free(buffer);
@@ -165,7 +165,7 @@ void addMapping(FILE* disk, int inodeNum, int inodeBlockNumber){
 
 	readBlock(disk, mappingBlock, buffer, blockSize);
 	memcpy(buffer +((inodeNum-1) * 4), &inodeBlockNumber, 4); 
-	writeBlock(disk, mappingBlock, buffer6, blockSize);
+	writeBlock(disk, mappingBlock, buffer, blockSize);
 	free(buffer);	
 }
 
@@ -221,7 +221,7 @@ void deleteMapping(FILE* disk, int inodeNum){
 }
 
 
-void create_singleIndirect(FILE* disk, short* blockNumberArray, int arraySize, short* indirectBlockNumber ){
+void create_singleIndirect(FILE* disk, short* blockNumberArray, int arraySize, short* indirectBlockNumber){
 	int freeBlockNumber;
 	readFreeBlockVector(disk, &freeBlockNumber);
 	fillFreeBlockVector(disk, freeBlockNumber);	
@@ -266,17 +266,17 @@ void indirectArray(FILE* disk, short indirectBlockNumber, short* resultBlockNumb
 void createFileInode(FILE* disk, int freeBlockNumber, short* blockNumberArray, int arraySize, int fileSize){
 	char* inode = calloc(blockSize, 1);
 	int flags = 1;
-	short dataBlock[12];
+	short dataBlockArray[12];
 	
 	for(int i = 0; i < 12; i++){
-		dataBlock[i] = -1;
-		memcpy(inode+8+(i*2), &dataBlock[i], 2);
+		dataBlockArray[i] = -1;
+		memcpy(inode+8+(i*2), &dataBlockArray[i], 2);
 	}
 	
 	if(arraySize < 11){
 		for(int i = 0; i < arraySize; i++){
-			dataBlock[i] = blockNumberArray[i];
-			memcpy(inode+8+(i*2), &dataBlock[i], 2);
+			dataBlockArray[i] = blockNumberArray[i];
+			memcpy(inode+8+(i*2), &dataBlockArray[i], 2);
 		}
 		
 		memcpy(inode, &fileSize, 4);
@@ -293,8 +293,8 @@ void createFileInode(FILE* disk, int freeBlockNumber, short* blockNumberArray, i
 	else{
 
 		for(int i = 0; i < 10; i++){
-			dataBlock[i] = blockNumberArray[i];
-			memcpy(inode+8+(i*2), &dataBlock[i], 2);
+			dataBlockArray[i] = blockNumberArray[i];
+			memcpy(inode+8+(i*2), &dataBlockArray[i], 2);
 		}
 		
 		short indirectBlockNumber = -1;
@@ -321,18 +321,18 @@ void create_file_single_inode(FILE* disk, int freeBlockNumber, int directBlockNu
 	char* inode = calloc(blockSize, 1);
 	int fileSize = 0;
 	int flags = 1;
-	short dataBlock[12];
+	short dataBlockArray[12];
 	
 	for(int i = 0; i < 12; i++){
-		dataBlock[i] = -1;
-		memcpy(inode+8+(i*2), &dataBlock[i], 2);
+		dataBlockArray[i] = -1;
+		memcpy(inode+8+(i*2), &dataBlockArray[i], 2);
 	}
 
-    short dataBlock = (short) directBlockNumber;
+    short dataBlockArray = (short) directBlockNumber;
 	
 	memcpy(inode, &fileSize, 4);
 	memcpy(inode+4, &flags, 4);
-	memcpy(inode+8, &dataBlock, 2);
+	memcpy(inode+8, &dataBlockArray, 2);
 
 	writeBlock(disk, freeBlockNumber, inode, blockSize);
 	
@@ -340,23 +340,23 @@ void create_file_single_inode(FILE* disk, int freeBlockNumber, int directBlockNu
 }	
 
 	
-void create_directory_inode(FILE* disk, int freeBlockNumber, int directBlockNumber ){
+void createDirectoryInode(FILE* disk, int freeBlockNumber, int directBlockNumber){
 
 	char* inode = calloc(blockSize, 1);
 	int fileSize = 0;
 	int flags = 2;
-	short dataBlock[12];
+	short dataBlockArray[12];
 	
 	for(int i = 0; i < 12; i++){
-		dataBlock[i] = -1;
-		memcpy(inode+8+(i*2), &dataBlock[i], 2);
+		dataBlockArray[i] = -1;
+		memcpy(inode+8+(i*2), &dataBlockArray[i], 2);
 	}
 
-    short dataBlock = (short) directBlockNumber;
+    short dataBlockArray = (short) directBlockNumber;
 	
 	memcpy(inode, &fileSize, 4);
 	memcpy(inode+4, &flags, 4);
-	memcpy(inode+8, &dataBlock, 2);
+	memcpy(inode+8, &dataBlockArray, 2);
 
 	writeBlock(disk, freeBlockNumber, inode, blockSize);
 	
@@ -388,39 +388,39 @@ void extendParentDirectory(FILE* disk, int parentDirectoryBlockNumber, int* newB
 	fillFreeBlockVector(disk, freeBlockNumber);
 	memcpy(newBlockNumber, &freeBlockNumber, 4);
 
-	int latest_datablock;
+	int latest_dataBlockArray;
 	short resultBlockNumber[12];
 	
 	readInode(disk, parentDirectoryBlockNumber, resultBlockNumber);
 
 	for(int i = 0; i < 10; i++){
 		if(resultBlockNumber[i] != -1){
-			latest_datablock = i;
+			latest_dataBlockArray = i;
 		}
 	}
 	
-	resultBlockNumber[latest_datablock+1] = (short) freeBlockNumber;
+	resultBlockNumber[latest_dataBlockArray+1] = (short) freeBlockNumber;
 	char* inode = calloc(32, 1);
     readBlock(disk, parentDirectoryBlockNumber, inode, 32);				
-	memcpy(inode+8+((latest_datablock+1)*2), &resultBlockNumber[latest_datablock+1], 2);
+	memcpy(inode+8+((latest_dataBlockArray+1)*2), &resultBlockNumber[latest_dataBlockArray+1], 2);
 	writeBlock(disk, parentDirectoryBlockNumber, inode, 32);
 	free(inode);
 }
 
 
 void editParentDirectory(FILE* disk, int parentDirectoryBlockNumber, int childDirectoryInodeNumber, char* childDirectoryName){
-	int latest_datablock;
+	int latest_dataBlockArray;
 	short resultBlockNumber[12];
 	readInode(disk, parentDirectoryBlockNumber, resultBlockNumber);
 
 	for(int i = 0; i < 10; i++){
 		if(resultBlockNumber[i] != -1){
-			latest_datablock = i;
+			latest_dataBlockArray = i;
 		}
 	}
 	
 	char* buffer = (char*)calloc(blockSize, 1);	
-	readBlock(disk, resultBlockNumber[latest_datablock], buffer, blockSize);  
+	readBlock(disk, resultBlockNumber[latest_dataBlockArray], buffer, blockSize);  
 	int entryNumber = -1; 
 	
 	for(int i = 0;(i < 16)&&(entryNumber == -1); i++){
@@ -452,7 +452,7 @@ void editParentDirectory(FILE* disk, int parentDirectoryBlockNumber, int childDi
 		memcpy(buffer +(entryNumber*32), &inodeNumber, 1);
 		strncpy(buffer +(entryNumber*32) +1, childDirectoryName, 31);
 
-		writeBlock(disk, resultBlockNumber[latest_datablock], buffer, blockSize);
+		writeBlock(disk, resultBlockNumber[latest_dataBlockArray], buffer, blockSize);
 	}
 	free(buffer);
 }
@@ -518,7 +518,7 @@ void searchFileOrDirectory(FILE* disk, int directBlockNumber, char* fileName, in
 		memcpy(findingInode, &tempInodeNumber2, 4);
 	}
 	
-	free(buffer3);
+	free(buffer);
 	
 }
 
@@ -583,7 +583,7 @@ void createSubDirectory(FILE* disk, int parentDirectoryBlockNumber, char* childD
 }
 
 
-void createFile(FILE* disk, char* fileContent, int parentDirectoryInode, char* fileName ){
+void createFile(FILE* disk, char* fileContent, int parentDirectoryInode, char* fileName){
 	if(strlen(fileContent) < 512){
 		int freeBlockNumber;
 		char* fileContent = (char*)calloc(blockSize, 1);
@@ -743,7 +743,7 @@ void openFile(FILE* disk, char* input){
 			}
 
 			if(checkInodeNum < 1){
-				printf("\nNo such directory or file in this datablock: '%s'\n", currFileName);
+				printf("\nNo such directory or file in this dataBlockArray: '%s'\n", currFileName);
 				break;
 			}
 			
@@ -795,7 +795,7 @@ void openFile(FILE* disk, char* input){
 				}
 			}
 			if(checkInodeNum < 1){
-				printf("\nNo such directory in this datablock: '%s'\n", currFileName);
+				printf("\nNo such directory in this dataBlockArray: '%s'\n", currFileName);
 				break;
 			}
 		}
@@ -850,7 +850,7 @@ void makeDirectory(FILE* disk, char* input){
 			}
 			
 			if(checkInodeNum < 1){
-				printf("No such directory in this datablock: '%s'\n", currentDirectoryName);
+				printf("No such directory in this dataBlockArray: '%s'\n", currentDirectoryName);
 				break;
 			}
 		}
@@ -897,7 +897,7 @@ void writeFile(FILE* disk, char* input, char* fileContent){
 				}
 			}
 			if(checkInodeNum < 1){
-				printf("\nNo such directory in this datablock: '%s'\n", currFileName);
+				printf("\nNo such directory in this dataBlockArray: '%s'\n", currFileName);
 				break;
 			}
 		}
@@ -950,7 +950,7 @@ void writeEmptyFile(FILE* disk, char* input){
 				}
 			}
 			if(checkInodeNum < 1){
-				printf("\nNo such directory in this datablock: '%s'\n", currFileName);
+				printf("\nNo such directory in this dataBlockArray: '%s'\n", currFileName);
 				break;
 			}
 		}
@@ -1058,7 +1058,7 @@ void rmFile(FILE* disk, char* input){
 			}
 			
 			if(checkInodeNum < 1){
-				printf("\nNo such directory in this datablock: '%s'\n", currFileName);
+				printf("\nNo such directory in this dataBlockArray: '%s'\n", currFileName);
 				break;
 			}
 		}
@@ -1131,7 +1131,7 @@ void listFile(FILE* disk, char* input){
 				}
 			}
 			if(checkInodeNum < 1){
-				printf("\nNo such directory in this datablock: '%s'\n", currentDirectoryName);
+				printf("\nNo such directory in this dataBlockArray: '%s'\n", currentDirectoryName);
 				break;
 			}
 			
@@ -1174,7 +1174,7 @@ void listFile(FILE* disk, char* input){
 			}
 			
 			if(checkInodeNum < 1){
-				printf("\nNo such directory in this datablock: '%s'\n", currentDirectoryName);
+				printf("\nNo such directory in this dataBlockArray: '%s'\n", currentDirectoryName);
 				break;
 			}
 		}
@@ -1242,7 +1242,7 @@ void rmDirectory(FILE* disk, char* input){
 			}
 			
 			if(checkInodeNum < 1){
-				printf("\nNo such directory in this datablock: '%s'\n", currentDirectoryName);
+				printf("\nNo such directory in this dataBlockArray: '%s'\n", currentDirectoryName);
 				break;
 			}
 		}
