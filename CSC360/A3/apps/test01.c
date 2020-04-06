@@ -26,7 +26,7 @@ FILE* disk;
 		disk = fopen("../disk/vdisk", "rb+"); // create the file to be written to in binary mode
 
 	}
-	initLLFS(disk);
+	//initLLFS(disk);
 
 	readSuperblock (disk);
 	
@@ -51,8 +51,8 @@ FILE* disk;
 
 	
 	
-	//test case: "Open /home/dir1/dir2/file1"
-	char input5[] = "Open /home/dir1/dir2/file1";
+	//test case: "Open /home/dir1/dir2/helloworld"
+	char input5[] = "Open /home/dir1/dir2/helloworld";
 	commandInput (disk, input5, input5);
 
 	
