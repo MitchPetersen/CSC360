@@ -384,92 +384,69 @@ void extendParentDirectoryBlock(FILE* disk, int parentDirectoryNode, int* newBlo
 }
 
 
-void edit_parent_dir_block(FILE* disk, int parent_dir_node_block_num, int child_dir_inode_num, char* child_dir_name){
-	
-	int latest_datablock;
-	short result_block_num[12];
-	
-	readInode(disk, parent_dir_node_block_num, result_block_num);
+void EditParentDirectoryBlock(FILE* disk, int parentDirectoryNode, int childDirectoryNode, char* childDirectoryName){
+	int latestDataBlock;
+	short resultBlock[12];
+	readInode(disk, parentDirectoryNode, resultBlock);
 
 	for(int i = 0; i < 10; i++){
-		if(result_block_num[i] != -1){
-			latest_datablock = i;
-		}
-	}
-	//printf("\n\n\n\n   *****latest_datablock: %d   \n\n\n\n", latest_datablock);  
-	
-	char* buffer7 = (char*)calloc(BLOCK_SIZE, 1);	
-	readBlock(disk, result_block_num[latest_datablock], buffer7, BLOCK_SIZE);  
-
-	int entry_num = -1; 
-	
-	for(int i = 0;(i < 16)&&(entry_num == -1); i++){
-		
-		unsigned char temp_inode_number; 
-		memcpy(&temp_inode_number, buffer7 +(i*32), 1); 
-		
-		int temp_inode_number2 = (int) temp_inode_number; 
-
-		if(temp_inode_number2 == 0){
-			entry_num = i;
+		if(resultBlock[i] != -1){
+			latestDataBlock = i;
 		}
 	}
 	
-	if(entry_num == -1){			// full entry
+	char* buffer = (char*)calloc(BLOCK_SIZE, 1);	
+	readBlock(disk, resultBlock[latestDataBlock], buffer, BLOCK_SIZE);  
+	int entryNumber = -1; 
+	
+	for(int i = 0;(i < 16)&&(entryNumber == -1); i++){
+		unsigned char temp; 
+		memcpy(&temp, buffer + (i*32), 1); 
+		int temp2 = (int) temp; 
 		
-		printf("\n\n\n\n   *****extending directory block of parent   \n\n\n\n");
-		
+		if(temp2 == 0){
+			entryNumber = i;
+		}
+	}
+	
+	if(entryNumber == -1){
 		int new_block_num;
-		extendParentDirectoryBlock(disk, parent_dir_node_block_num, &new_block_num);	// create new block+link it up to parent inode
-		
-		unsigned char inode_number = (char) child_dir_inode_num;
-
-		memcpy(buffer7 +(entry_num*32), &inode_number, 1);			//child_dir_inode_num = new build dir inode#
-		strncpy(buffer7 +(entry_num*32) +1, child_dir_name, 31);
-
-		writeBlock(disk, new_block_num, buffer7, BLOCK_SIZE);
+		extendParentDirectoryBlock(disk, parentDirectoryNode, &new_block_num);
+		unsigned char inodeNumber = (char) childDirectoryNode;
+		memcpy(buffer +(entryNumber*32), &inodeNumber, 1);
+		strncpy(buffer +(entryNumber*32) +1, childDirectoryName, 31);
+		writeBlock(disk, new_block_num, buffer, BLOCK_SIZE);
 	}
 	
 	else{
-		unsigned char inode_number = (char) child_dir_inode_num;
-
-		memcpy(buffer7 +(entry_num*32), &inode_number, 1);
-		strncpy(buffer7 +(entry_num*32) +1, child_dir_name, 31);
-
-		writeBlock(disk, result_block_num[latest_datablock], buffer7, BLOCK_SIZE);
+		unsigned char inodeNumber = (char) childDirectoryNode;
+		memcpy(buffer +(entryNumber*32), &inodeNumber, 1);
+		strncpy(buffer +(entryNumber*32) +1, childDirectoryName, 31);
+		writeBlock(disk, resultBlock[latestDataBlock], buffer, BLOCK_SIZE);
 	}
-	free(buffer7);
+	free(buffer);
 }
 
 
-
-
-void del_entry_dir_block(FILE* disk, int parent_dir_block_num, int del_file_inode_num){
+void deleteEntryDirectoryBlock(FILE* disk, int parentDirectoryNode, int deleteFileInodeNumber){
+	char* buffer = (char*)calloc(BLOCK_SIZE, 1);	
+	readBlock(disk, parentDirectoryNode, buffer, BLOCK_SIZE);
+	int entryNumber = -1;
 	
-	char* buffer7 = (char*)calloc(BLOCK_SIZE, 1);	
-	readBlock(disk, parent_dir_block_num, buffer7, BLOCK_SIZE);
-
-	int entry_num = -1;
-	
-	for(int i = 0;(i < 16)&&(entry_num == -1); i++){
+	for(int i = 0;(i < 16)&&(entryNumber == -1); i++){
+		unsigned char temp;
+		memcpy(&temp, buffer +(i*32), 1);
+		int temp2 = (int) temp;
 		
-		unsigned char temp_inode_number;
-		memcpy(&temp_inode_number, buffer7 +(i*32), 1);
-		
-		int temp_inode_number2 = (int) temp_inode_number;
-		//printf("*****testing: %d\n", temp_inode_number2);
-		
-		if(temp_inode_number2 == del_file_inode_num){
-			entry_num = i;
+		if(temp2 == deleteFileInodeNumber){
+			entryNumber = i;
 		}
 	}
-	//printf("*****testing deleteing_entry_num: %d\n", entry_num);
-
-	char* temp_entry_buffer = (char*)calloc(32, 1);	
-	memcpy(buffer7 +(entry_num*32), temp_entry_buffer, 32);
-	writeBlock(disk, parent_dir_block_num, buffer7, BLOCK_SIZE);
 	
-	free(buffer7);
+	char* temp3 = (char*)calloc(32, 1);	
+	memcpy(buffer +(entryNumber*32), temp2, 32);
+	writeBlock(disk, parentDirectoryNode, buffer, BLOCK_SIZE);
+	free(buffer);
 }
 
 
@@ -587,7 +564,7 @@ void create_sub_directory(FILE* disk, int parent_dir_node_block_num, char* child
 	
 	//modify parent(root)
 	int child_dir_inode_num = next_free_inode_index3;   
-	edit_parent_dir_block(disk, parent_dir_node_block_num, child_dir_inode_num, child_dir_name);
+	EditParentDirectoryBlock(disk, parent_dir_node_block_num, child_dir_inode_num, child_dir_name);
 }
 
 
@@ -631,7 +608,7 @@ void create_file(FILE* disk, char* file_content, int parent_dir_inode_num, char*
 		//add to parent inode(into sub directory)
 
 		int file_inode_num = next_free_inode_index4;   
-		edit_parent_dir_block(disk, parent_dir_inode_num, file_inode_num, file_name);
+		EditParentDirectoryBlock(disk, parent_dir_inode_num, file_inode_num, file_name);
 	}
 	else {
 		
@@ -686,7 +663,7 @@ void create_file(FILE* disk, char* file_content, int parent_dir_inode_num, char*
 		//add to parent inode(into sub directory)
 
 		int file_inode_num = next_free_inode_index4;   
-		edit_parent_dir_block(disk, parent_dir_inode_num, file_inode_num, file_name);
+		EditParentDirectoryBlock(disk, parent_dir_inode_num, file_inode_num, file_name);
 	}
 }
 
@@ -724,7 +701,7 @@ void create_empty_file(FILE* disk, int parent_dir_inode_num, char* file_name){
 		//add to parent inode(into sub directory)
 
 		int file_inode_num = next_free_inode_index4;   
-		edit_parent_dir_block(disk, parent_dir_inode_num, file_inode_num, file_name);
+		EditParentDirectoryBlock(disk, parent_dir_inode_num, file_inode_num, file_name);
 }
 
 
@@ -1096,7 +1073,7 @@ void delete_file(FILE* disk, int parent_dir_block_num, char* curr_file_name, int
 	
 	deleteMapping(disk, del_file_inode_num);
 	
-	del_entry_dir_block(disk, parent_dir_block_num, del_file_inode_num);
+	deleteEntryDirectoryBlock(disk, parent_dir_block_num, del_file_inode_num);
 }
 
 
@@ -1122,7 +1099,7 @@ void delete_directory(FILE* disk, int parent_dir_block_num, char* curr_file_name
 	
 	deleteMapping(disk, del_dir_inode_num);
 	
-	del_entry_dir_block(disk, parent_dir_block_num, del_dir_inode_num);
+	deleteEntryDirectoryBlock(disk, parent_dir_block_num, del_dir_inode_num);
 }
 
 
