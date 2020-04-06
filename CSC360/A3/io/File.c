@@ -747,16 +747,16 @@ void openFile(FILE* disk, char* input){
 				break;
 			}
 			
-			short resultBlockNumber[12];
-			readInode(disk, savedParentInodeBlockNumber, resultBlockNumber);
-			if(resultBlockNumber[10] > 0){
+			short resultBlockNumber2[12];
+			readInode(disk, savedParentInodeBlockNumber, resultBlockNumber2);
+			if(resultBlockNumber2[10] > 0){
 				short size;
-				indirectSize(disk, resultBlockNumber[10], &size);
+				indirectSize(disk, resultBlockNumber2[10], &size);
 				
 				short resultBlockNumber5[size];
 				readInode(disk, savedParentInodeBlockNumber, resultBlockNumber5);	
 				
-				indirectArray(disk, resultBlockNumber[10], resultBlockNumber5, size);
+				indirectArray(disk, resultBlockNumber2[10], resultBlockNumber5, size);
 				
 				printf("\nContent of the file: ");
 				
@@ -772,9 +772,9 @@ void openFile(FILE* disk, char* input){
 			}
 			else{
 				printf("\nContent of the file: ");
-				for(int i = 0;(resultBlockNumber[i] != -1) &&(i<10); i++){
+				for(int i = 0;(resultBlockNumber2[i] != -1) &&(i<10); i++){
 					char* buffer = (char*)calloc(blockSize,1);	
-					readBlock(disk, (int)resultBlockNumber[i], buffer, blockSize);
+					readBlock(disk, (int)resultBlockNumber2[i], buffer, blockSize);
 					printf("%s", buffer);
 						
 					free(buffer);
@@ -785,11 +785,11 @@ void openFile(FILE* disk, char* input){
 
 		else {
 			int checkInodeNum;		
-			short resultBlockNumber[12];
-			readInode(disk, savedParentInodeBlockNumber, resultBlockNumber);
+			short resultBlockNumber3[12];
+			readInode(disk, savedParentInodeBlockNumber, resultBlockNumber3);
 			
-			for(int i = 0; resultBlockNumber[i] != -1; i++){
-				searchFileOrDirectory(disk, resultBlockNumber[i], currFileName, &checkInodeNum);
+			for(int i = 0; resultBlockNumber3[i] != -1; i++){
+				searchFileOrDirectory(disk, resultBlockNumber3[i], currFileName, &checkInodeNum);
 				if(checkInodeNum > 0){
 					savedParentInodeBlockNumber = findMapping(disk, checkInodeNum);
 				}
