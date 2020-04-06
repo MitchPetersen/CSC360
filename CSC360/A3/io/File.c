@@ -681,15 +681,15 @@ void createEmptyFile(FILE* disk, int parentDirectoryInode, char* fileName){
 	createDirectoryInode(disk, freeBlockNumber2, fileBlockNumber);
 	fillFreeBlockVector(disk, freeBlockNumber2);
 
-	int nextFreeInodeIndex4;
+	int nextFreeInodeIndex;
 	
-	findNextFreeInode(disk, &next_freeInodeIndex4);
+	findNextFreeInode(disk, &nextFreeInodeIndex);
 	addMapping(disk, nextFreeInodeIndex, freeBlockNumber2);
 	
 	inodeNum++;
 	updateSuperblock(disk);
-	int file_inodeNum = next_freeInodeIndex4;   
-	editParentDirectory(disk, parentDirectoryInode, file_inodeNum, fileName);
+	int fileInodeNum = nextFreeInodeIndex;   
+	editParentDirectory(disk, parentDirectoryInode, fileInodeNum, fileName);
 }
 
 
