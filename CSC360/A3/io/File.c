@@ -658,7 +658,7 @@ void createFile(FILE* disk, char* fileContent, int parentDirectoryInode, char* f
 		inodeNum++;
 		updateSuperblock(disk);
 
-		int file_inodeNum = nextFreeInodeIndex;   
+		int fileInodeNum = nextFreeInodeIndex;   
 		editParentDirectory(disk, parentDirectoryInode, fileInodeNum, fileName);
 	}
 }

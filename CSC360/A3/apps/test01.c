@@ -38,40 +38,40 @@ FILE* disk;
 	
 	//test case: "Mkdir /home"
 	char input1[] = "Mkdir /home";
-	command_input ( disk, input1, input1 );
+	commandInput ( disk, input1, input1 );
 	
 	//test case: "Mkdir /home/hello"
 	char input2[] = "Mkdir /home/hello";
-	command_input ( disk, input2, input2 );
+	commandInput ( disk, input2, input2 );
 
 	//test case: "Mkdir /home/hello/hello2"
 	char input3[] = "Mkdir /home/hello/hello2";
-	command_input ( disk, input3, input3 );
+	commandInput ( disk, input3, input3 );
 	
 	
 	//test case: "Writefile /home/hello/hello2/helloworld" with content "hello world"
 	
 	char input4[] = "Writefile /home/hello/hello2/helloworld";
 	char file_content[] = "hello world";
-	command_input ( disk, input4, file_content );
+	commandInput ( disk, input4, file_content );
 
 	
 	
 	//test case: "Open /home/hello/hello2/file1"
 	char input5[] = "Open /home/hello/hello2/file1";
-	command_input ( disk, input5, input5 );
+	commandInput ( disk, input5, input5 );
 
 	
 	//test case: "Mkdir /home/hello_2nd"
 	char input6[] = "Mkdir /home/hello_2nd";
-	command_input ( disk, input6, input6 );
+	commandInput ( disk, input6, input6 );
 	
 	
 	//test case: "Writefile /home/hello/hello2/testing2" and the content is "hello world hello world"
 	
 	char input7[] = "Writefile //home/hello/hello2/testing2";
 	char file_content_larger2[] = "hello world hello world";
-	command_input ( disk, input7, file_content_larger2 );
+	commandInput ( disk, input7, file_content_larger2 );
 
 	
 
@@ -89,66 +89,66 @@ FILE* disk;
 	for ( int i = 1024; i < 1026; i++ ){
 		file_content_larger[i] = 'c';
 	}
-	command_input ( disk, input8, file_content_larger );
+	commandInput ( disk, input8, file_content_larger );
 
 	
 	//test case: "Open /home/hello_2nd/testing"
 	char input9[] = "Open /home/hello_2nd/testing";
-	command_input ( disk, input9, input9 );
+	commandInput ( disk, input9, input9 );
 	
 	//printf( "\n\n\n\n" );
 	//read_superblock( disk );	
 	
 	//test case: delete ( Rmfile )
 	char input10[] = "Rmfile /home/hello_2nd/testing";
-	command_input ( disk, input10, input10 );
+	commandInput ( disk, input10, input10 );
 
 
 	//test case: "list /home/hello_2nd/testing"
 	char input11[] = "list /home/hello_2nd";
-	command_input ( disk, input11, input11 );
+	commandInput ( disk, input11, input11 );
 	
 	
 	//test case: delete ( Rmdir )
 	char input12[] = "Rmdir /home/hello_2nd";
-	command_input ( disk, input12, input12 );
+	commandInput ( disk, input12, input12 );
 
 	
 	//test case: "list /home/hello_2nd"
 	char input13[] = "list /home/hello_2nd";
-	command_input ( disk, input13, input13 );
+	commandInput ( disk, input13, input13 );
 	
 	
 	
 	//test case: "list /home"
 	char input14[] = "list /home";
-	command_input ( disk, input14, input14 );	
+	commandInput ( disk, input14, input14 );	
 	
 	
 	//test case: file create in root dir
 	char input15[] = "Writefile /testing3";
 	char file_content_larger3[] = "hello world hello world";
-	command_input ( disk, input15, file_content_larger3 );
+	commandInput ( disk, input15, file_content_larger3 );
 	
 	
 	//test case: "list /"
 	char input16[] = "list /";
-	command_input ( disk, input16, input16 );	
+	commandInput ( disk, input16, input16 );	
 	
 	
 	//test case: "Writefile /home/hello/hello2/testing4" and the content is Empty
 	
 	char input17[] = "Writefile /home/hello/hello2/testing4";
 	char* file_content_empty = NULL;
-	command_input ( disk, input17, file_content_empty );
+	commandInput ( disk, input17, file_content_empty );
 	
 	//test case: "list /home/hello/hello2"
 	char input18[] = "list /home/hello/hello2";
-	command_input ( disk, input18, input18 );	
+	commandInput ( disk, input18, input18 );	
 	
 	//test case: "Open /home/hello/hello2/testing4"
 	char input19[] = "Open /home/hello/hello2/testing4";
-	command_input ( disk, input19, input19 );
+	commandInput ( disk, input19, input19 );
 	
 	
 	//test case: 
@@ -162,12 +162,12 @@ FILE* disk;
 	file_content_larger4[9140] = 'u';
 	
 	//printf( "\n\n%s\n\n" , file_content_larger4 );
-	command_input ( disk, input20, file_content_larger4 );
+	commandInput ( disk, input20, file_content_larger4 );
 	
 	
 	//test case: "Open /home/hello/hello2/test11"
 	char input21[] = "Open /home/hello/hello2/test11";
-	command_input ( disk, input21, input21 );
+	commandInput ( disk, input21, input21 );
 
 	
 	printf( "\n        **********END OF TEST CASES***********  \n\n\n" );
