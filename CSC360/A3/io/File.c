@@ -316,7 +316,7 @@ void createFileInode(FILE* disk, int freeBlockNumber, short* blockNumberArray, i
 }
 
 
-void create_file_single_inode(FILE* disk, int freeBlockNumber, int directBlockNumber){
+void createFileSingleInode(FILE* disk, int freeBlockNumber, int directBlockNumber){
 
 	char* inode = calloc(blockSize, 1);
 	int fileSize = 0;
@@ -328,11 +328,11 @@ void create_file_single_inode(FILE* disk, int freeBlockNumber, int directBlockNu
 		memcpy(inode+8+(i*2), &dataBlockArray[i], 2);
 	}
 
-    short dataBlockArray = (short) directBlockNumber;
+    short dataBlock = (short) directBlockNumber;
 	
 	memcpy(inode, &fileSize, 4);
 	memcpy(inode+4, &flags, 4);
-	memcpy(inode+8, &dataBlockArray, 2);
+	memcpy(inode+8, &dataBlock, 2);
 
 	writeBlock(disk, freeBlockNumber, inode, blockSize);
 	
@@ -572,7 +572,7 @@ void createSubDirectory(FILE* disk, int parentDirectoryBlockNumber, char* childD
 	int nextFreeInodeIndex;
 	findNextFreeInode(disk, &nextFreeInodeIndex);
 
-	addMapping(disk, next_freeInodeIndex, freeBlockNumber2);
+	addMapping(disk, nextFreeInodeIndex, freeBlockNumber2);
 	
 	inodeNum++;
 	updateSuperblock(disk);
