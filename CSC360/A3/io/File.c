@@ -834,7 +834,7 @@ void makeDirectory(FILE* disk, char* input){
 		printf("currentDirectoryName: %s ", currentDirectoryName);
 		printf("parentDirectoryName: %s\n", parentDirectoryName);
 		if(fakeCurrentDirectoryName == NULL){
-			create_sub_directory(disk, savedParentInodeBlockNumber, currentDirectoryName);
+			createSubDirectory(disk, savedParentInodeBlockNumber, currentDirectoryName);
 			printf("\nWe added a sub directory: %s\n", currentDirectoryName);
 		}
 		else{
@@ -883,7 +883,7 @@ void writeFile(FILE* disk, char* input, char* fileContent){
 		strncpy(currFileName, fakeCurrentDirectoryName, 31);
 		fakeCurrentDirectoryName = strtok(NULL, s);
 		if(fakeCurrentDirectoryName == NULL){
-			create_file(disk, fileContent, savedParentInodeBlockNumber, currFileName);
+			createFile(disk, fileContent, savedParentInodeBlockNumber, currFileName);
 			printf("\nWe added a file, file name: %s\n", currFileName);
 		}
 		else{
@@ -1124,7 +1124,7 @@ void listFile(FILE* disk, char* input){
 			short resultBlockNumber2[12];
 			readInode(disk, savedParentInodeBlockNumber, resultBlockNumber2);
 			
-			for(int i = 0; resultBlockNumber3[i] != -1; i++){
+			for(int i = 0; resultBlockNumber2[i] != -1; i++){
 				searchFileOrDirectory(disk, resultBlockNumber2[i], currentDirectoryName, &checkInodeNum);
 				if(checkInodeNum > 0){
 					savedParentInodeBlockNumber = findMapping(disk, checkInodeNum);
@@ -1163,11 +1163,11 @@ void listFile(FILE* disk, char* input){
 			printf("\nWe listed all the files in %s directory.\n", currentDirectoryName);
 		} else {
 			int checkInodeNum;		
-			short resultBlockNumber[12];
-			readInode(disk, savedParentInodeBlockNumber, resultBlockNumber);
+			short resultBlockNumber3[12];
+			readInode(disk, savedParentInodeBlockNumber, resultBlockNumber3);
 			
-			for(int i = 0; resultBlockNumber[i] != -1; i++){
-				searchFileOrDirectory(disk, resultBlockNumber[i], currentDirectoryName, &checkInodeNum);
+			for(int i = 0; resultBlockNumber3[i] != -1; i++){
+				searchFileOrDirectory(disk, resultBlockNumber3[i], currentDirectoryName, &checkInodeNum);
 				if(checkInodeNum > 0){
 					savedParentInodeBlockNumber = findMapping(disk, checkInodeNum);
 				}

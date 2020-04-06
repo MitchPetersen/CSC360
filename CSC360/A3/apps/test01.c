@@ -31,7 +31,7 @@ FILE* disk;
 	}
 	//initLLFS( disk );
 
-	read_superblock ( disk );
+	readSuperblock ( disk );
 	
 	
 	
