@@ -1210,7 +1210,6 @@ void listFile(FILE* disk, char* input){
 	free(currentDirectoryname);
 	free(fakeCurrentDirectoryname);	
 }
-}
 
 
 
