@@ -27,12 +27,9 @@ FILE* disk;
 	else {
 		
 		disk = fopen("../disk/vdisk", "rb+"); // create the file to be written to in binary mode
-		char* init = calloc(BLOCK_SIZE*NUM_BLOCKS, 1);
-		fwrite(init, BLOCK_SIZE*NUM_BLOCKS, 1, disk);
-		free(init);
 
 	}
-	initLLFS( disk );
+	//initLLFS( disk );
 
 	read_superblock ( disk );
 	
@@ -52,10 +49,10 @@ FILE* disk;
 	command_input ( disk, input3, input3 );
 	
 	
-	//test case: "Writefile /home/hello/hello2/file1" and the content is "hello world I'm Ronald"
+	//test case: "Writefile /home/hello/hello2/helloworld" with content "hello world"
 	
-	char input4[] = "Writefile /home/hello/hello2/file1";
-	char file_content[] = "hello world I'm Ronald";
+	char input4[] = "Writefile /home/hello/hello2/helloworld";
+	char file_content[] = "hello world";
 	command_input ( disk, input4, file_content );
 
 	
