@@ -158,8 +158,8 @@ void addMapping(FILE* disk, int inodeNumber, int inodeBlock){	// assume max inod
 
 void findNextFreeInodenum(FILE* disk, int* inodeNumber){
 	int signal = 0;
-	int freeInodeIndex = 0
-	for(int i = 9;(i < 24)&&(signal == 0); i++){	
+	int freeInodeIndex = 0;
+	for(int i = 9; (i < 24) && (signal == 0); i++){	
 		char* buffer = (char*)calloc(BLOCK_SIZE, 1);
 		readBlock(disk, i, buffer, BLOCK_SIZE);
 		for(int j=0;(j < 128)&&(signal == 0); j++){
