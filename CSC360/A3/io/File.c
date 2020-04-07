@@ -687,7 +687,7 @@ void openFile(FILE* disk, char* input){
 				short result_block_num5[result_size];
 				readInode(disk, savedParentInode, result_block_num5);	
 				translate_indirect_to_array(disk, resultBlockNum[10], result_block_num5, result_size);
-				printf("\n	content of the file: \n");
+				printf("\n	# Content of the file: \n");
 				
 				for(int i = 0;(result_block_num5[i] != -1) &&(i<result_size); i++){
 					char* buffer = (char*)calloc(BLOCK_SIZE,1);	
@@ -931,93 +931,73 @@ void deleteDirectory(FILE* disk, int parentDirectoryBlockNumber, char* currentFi
 }
 
 
-void Rm_file(FILE* disk, char* input){
-	
-	char* parent_directory_name = (char*)calloc(31,1);	
-	char* curr_file_name = (char*)calloc(31,1);	
-	char* fake_curr_dir_name = (char*)calloc(31,1);	
-	
+void rmFile(FILE* disk, char* input){
+	char* parentDirectoryName = (char*)calloc(31,1);	
+	char* currentFileName = (char*)calloc(31,1);	
+	char* fakeCurrentDirectoryName = (char*)calloc(31,1);	
 	const char s[2] = "/";
 
-	fake_curr_dir_name = strtok(input, s);		// skip the first command "Mkfile"
-
-	strncpy(parent_directory_name, curr_file_name, 31);
-	strncpy(curr_file_name, fake_curr_dir_name, 31);
+	fakeCurrentDirectoryName = strtok(input, s);		// skip the first command
+	strncpy(parentDirectoryName, currentFileName, 31);
+	strncpy(currentFileName, fakeCurrentDirectoryName, 31);
+	fakeCurrentDirectoryName = strtok(NULL, s);
 	
-	fake_curr_dir_name = strtok(NULL, s);
+	int savedParentInodeBlockNumber = -1;
+	int newestROOTINODEINDEX = getRootInodeIndex(disk);
+	int rootInodeBlockNumber = findMapping(disk, newestROOTINODEINDEX);
+	short result_block_num4[12];
 	
-	int saved_parent_inode_block_num = -1;
+	readInode(disk, rootInodeBlockNumber, result_block_num4);
+	savedParentInodeBlockNumber = rootInodeBlockNumber;
 	
-		int newest_ROOT_INODE_INDEX = getRootInodeIndex(disk);
-			
-		int root_inode_block_num = findMapping(disk, newest_ROOT_INODE_INDEX);
+	while(fakeCurrentDirectoryName != NULL) {
+		strncpy(parentDirectoryName, currentFileName, 31);
+		strncpy(currentFileName, fakeCurrentDirectoryName, 31);
+		fakeCurrentDirectoryName = strtok(NULL, s);
 
-		short result_block_num4[12];
-		readInode(disk, root_inode_block_num, result_block_num4);
+		if(fakeCurrentDirectoryName == NULL){
+			short resultBlock[12];
+			readInode(disk, savedParentInodeBlockNumber, resultBlock);
+			int checkingInodeNum = -1;		
+			int fileAppearInWhichBlockOfDirectory;
 			
-		saved_parent_inode_block_num = root_inode_block_num;
-	
-	while(fake_curr_dir_name != NULL) {
-
-		strncpy(parent_directory_name, curr_file_name, 31);
-		strncpy(curr_file_name, fake_curr_dir_name, 31);
-		fake_curr_dir_name = strtok(NULL, s);
-		//printf("curr_file_name: %s ", curr_file_name);
-		//printf("parent_directory_name: %s\n", parent_directory_name);
-
-		if(fake_curr_dir_name == NULL){
-			
-			short result_block_num[12];
-			readInode(disk, saved_parent_inode_block_num, result_block_num);
-
-			int checking_inode_num = -1;		
-			int file_appear_in_which_block_of_directory;
-			
-			for(int i = 0;(result_block_num[i] != -1) &&(checking_inode_num == -1); i++){
-			
-				searchFileOrDirectory(disk, result_block_num[i], curr_file_name, &checking_inode_num);
+			for(int i = 0;(resultBlock[i] != -1) &&(checkingInodeNum == -1); i++){
+				searchFileOrDirectory(disk, resultBlock[i], currentFileName, &checkingInodeNum);
 				
-				if(checking_inode_num != -1){
-				
-					file_appear_in_which_block_of_directory = i;
+				if(checkingInodeNum != -1){
+					fileAppearInWhichBlockOfDirectory = i;
 				}
 			}
 			
-			if(checking_inode_num == -1){
-				printf("file not exist\n");
+			if(checkingInodeNum == -1){
+				printf("# file not exist\n");
 				break;
 			}
 			
-			delete_file(disk, result_block_num[file_appear_in_which_block_of_directory], curr_file_name, checking_inode_num);
-
-			printf("\n       $$$$$$$$$$$$$$ we deleted a file, file name: %s\n\n", curr_file_name);
-		}
-		else{
-
-			int checking_inode_num;		
-			short result_block_num[12];
-	
-			readInode(disk, saved_parent_inode_block_num, result_block_num);
+			delete_file(disk, resultBlock[fileAppearInWhichBlockOfDirectory], currentFileName, checkingInodeNum);
+			printf("\n	# We deleted a file, file name: %s\n", currentFileName);
+		} else {
+			int checkingInodeNum;		
+			short resultBlock[12];
+			readInode(disk, savedParentInodeBlockNumber, resultBlock);
 			
-			for(int i = 0; result_block_num[i] != -1; i++){
-			
-				searchFileOrDirectory(disk, result_block_num[i], curr_file_name, &checking_inode_num);
+			for(int i = 0; resultBlock[i] != -1; i++){
+				searchFileOrDirectory(disk, resultBlock[i], currentFileName, &checkingInodeNum);
 				
-				if(checking_inode_num > 0){
-					
-					saved_parent_inode_block_num = findMapping(disk, checking_inode_num);
+				if(checkingInodeNum > 0){
+					savedParentInodeBlockNumber = findMapping(disk, checkingInodeNum);
 				}
 			}
 			
-			if(checking_inode_num < 1){
-				printf("\n      no such directory in this datablock: '%s'   \n", curr_file_name);
+			if(checkingInodeNum < 1){
+				printf("\n	# No such directory in this datablock: '%s'\n", currentFileName);
 				break;
 			}
 		}
 	}
-	free(parent_directory_name);
-	free(curr_file_name);
-	free(fake_curr_dir_name);	
+	free(parentDirectoryName);
+	free(currentFileName);
+	free(fakeCurrentDirectoryName);	
 }
 
 void list_file(FILE* disk, char* input){
@@ -1305,7 +1285,7 @@ void command_input(FILE* disk, char* input, char* file_content_larger){
 	else if(strncmp(command7, "Rmfile", 6) == 0){
 		
 		printf("we are deleting a file at '%s'", path);
-		Rm_file(disk, input);
+		rmFile(disk, input);
 	}
 	else if((strncmp(command7, "Writefile", 6) == 0) && file_content_larger == NULL){
 
