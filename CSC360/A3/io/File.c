@@ -186,7 +186,7 @@ int findMapping(FILE* disk, int inodeNumber){
 	int temp2;
 	memcpy(&temp2, buffer +((inodeNumber-1) * 4), 4); 
 	free(buffer);	
-	return temp_block_num;
+	return temp2;
 }
 
 
@@ -195,7 +195,7 @@ void deleteMapping(FILE* disk, int inodeNumber){
 	int mappingBlock = MAPPING_BLOCK_START + temp;
 	char* buffer = (char*)calloc(BLOCK_SIZE, 1);
 	
-	readBlock(disk, mappingBlock, buffer6, BLOCK_SIZE);
+	readBlock(disk, mappingBlock, buffer, BLOCK_SIZE);
 	
 	int clearInode = 0;
 	memcpy(buffer + ((inodeNumber-1) * 4), &clearInode, 4); 
@@ -211,10 +211,10 @@ void createSingleIndirect(FILE* disk, short* fileBlockArray, int arraySize, shor
 	char* singleIndirectContent = (char*)calloc(BLOCK_SIZE, 1);
 	
 	for(int i = 10; i < arraySize; i++){
-		memcpy(single_indir_content + ((i-10)*2), &fileBlockArray[i], 2);
+		memcpy(singleIndirectContent + ((i-10)*2), &fileBlockArray[i], 2);
 	}
 
-	writeBlock(disk, freeBlockNum, single_indir_content, BLOCK_SIZE);
+	writeBlock(disk, freeBlockNum, singleIndirectContent, BLOCK_SIZE);
 	short temp	= (short) freeBlockNum; 
 	memcpy(singleIndirectBlockNum, &temp, 2);
 }
@@ -444,7 +444,7 @@ void deleteEntryDirectoryBlock(FILE* disk, int parentDirectoryNode, int deleteFi
 	}
 	
 	char* temp3 = (char*)calloc(32, 1);	
-	memcpy(buffer +(entryNumber*32), temp2, 32);
+	memcpy(buffer +(entryNumber*32), temp3, 32);
 	writeBlock(disk, parentDirectoryNode, buffer, BLOCK_SIZE);
 	free(buffer);
 }
@@ -472,7 +472,7 @@ void searchFileOrDirectory(FILE* disk, int directoryBlockNumber, char* fileName,
 		memcpy(findingInodeNumber, &temp2, 4);
 	} else {
 		int temp2 = -1;
-		memcpy(findingInodeNum, &temp2, 4);
+		memcpy(findingInodeNumber, &temp2, 4);
 	}
 	free(buffer);
 }
@@ -686,7 +686,7 @@ void openFile(FILE* disk, char* input){
 				IndirectToSize(disk, resultBlockNum[10], &result_size);
 				short result_block_num5[result_size];
 				readInode(disk, savedParentInode, result_block_num5);	
-				translate_indirect_to_array(disk, resultBlockNum[10], result_block_num5, result_size);
+				IndirectToArray(disk, resultBlockNum[10], result_block_num5, result_size);
 				printf("\n	# Content of the file: \n");
 				
 				for(int i = 0;(result_block_num5[i] != -1) &&(i<result_size); i++){
@@ -786,7 +786,7 @@ void makeDirectory(FILE* disk, char* input){
 			}
 		}
 	}
-	free(parent_directory_name);
+	free(parentDirectoryName);
 	free(currentDirectoryName);
 	free(fakeCurrentDirectoryName);	
 }
@@ -916,8 +916,8 @@ void delete_file(FILE* disk, int parentDirectoryBlockNumber, char* currentFileNa
 
 void deleteDirectory(FILE* disk, int parentDirectoryBlockNumber, char* currentFileName, int deleteDirectoryInodeNumber){
 	short delBlockNumber[12];
-	int deleteDirectoryInodeNumber = findMapping(disk, delBlockNumber);
-	readInode(disk, deleteDirectoryInodeNumber, delBlockNumber);
+	int deleteInodeBlockNumber = findMapping(disk, delBlockNumber);
+	readInode(disk, deleteInodeBlockNumber, delBlockNumber);
 	
 	for(int i = 0; delBlockNumber[i] != -1; i++){
 		deleteFreeBlockVector(disk, delBlockNumber[i]);
