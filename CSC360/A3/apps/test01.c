@@ -74,7 +74,7 @@ int main(int argc, char* argv[]) {
 	command_input(disk, input9, input9);
 	
 	//test case: delete(Rmfile)
-	char input10[] = "Rmfile /momsspaghetti";
+	char input10[] = "Rmfile /momsspaghetti/snap/reality3";
 	command_input(disk, input10, input10);
 	
 	//test case: delete directory
