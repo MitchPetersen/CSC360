@@ -926,7 +926,7 @@ void deleteDirectory(FILE* disk, int parentDirectoryBlockNumber, char* currentFi
 	deleteFreeBlockVector(disk, deleteDirectoryInodeNumber);
 	NUM_INODE--;
 	updateSuperblock(disk);
-	deleteMapping(deleteDirectoryInodeNumber);
+	deleteMapping(disk, deleteDirectoryInodeNumber);
 	deleteEntryDirectoryBlock(disk, parentDirectoryBlockNumber, deleteDirectoryInodeNumber);
 }
 
@@ -1220,9 +1220,9 @@ void command_input(FILE* disk, char* input, char* file_content_larger){
 	path = strtok(NULL, "");
 	
 	if(file_content_larger != NULL){
-		robust_superblock(disk, input, strlen(file_content_larger));
+		robustSuperblock(disk, input, strlen(file_content_larger));
 	}else{
-		robust_superblock(disk, input, 0);
+		robustSuperblock(disk, input, 0);
 	}
 	
 	if(path == NULL){
