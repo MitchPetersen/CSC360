@@ -1,0 +1,7 @@
+I went for a low level design utilizing memcopy mainly. 
+
+A blocksize of 512, 4096 blocks, with an inode size of 32 (no more than 2048 inodes). Blocks 1-8 are sectioned off for free block vector. reducing overall space available.
+
+The tradeoffs I made using a memcopy based approach were significant increases in debug time. But as a result the end product is cleaner.
+
+I didn't get around to making the system robust.

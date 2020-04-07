@@ -1206,7 +1206,7 @@ void command_input(FILE* disk, char* input, char* fileContent){
 		path = "root";
 	}
 	
-	printf("\n\ntest case %d: ", x++);
+	printf("\n\nTest Case %d: ", x++);
 	if(strncmp(command7, "list", 4) == 0){		
 		printf("Listing the file in a directory at '%s'", path);
 		listFile(disk, input, path);

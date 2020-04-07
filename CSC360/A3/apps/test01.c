@@ -74,12 +74,8 @@ int main(int argc, char* argv[]) {
 	command_input(disk, input9, input9);
 	
 	//test case: delete(Rmfile)
-	char input10[] = "Rmfile /momsspaghetti/snap/reality3";
+	char input10[] = "Rmfile /momsspaghetti";
 	command_input(disk, input10, input10);
-
-	//test case: "list /momsspaghetti/snap/reality3"
-	char input11[] = "list /momsspaghetti/snap";
-	command_input(disk, input11, input11);
 	
 	//test case: delete directory
 	char input12[] = "Rmdir /momsspaghetti/snap";
@@ -125,7 +121,7 @@ int main(int argc, char* argv[]) {
 	command_input(disk, input21, input21);
 
 	
-	printf("\n	# Finished");
+	printf("\n	# Finished \n");
 	
 	fclose(disk);
     return 0;
