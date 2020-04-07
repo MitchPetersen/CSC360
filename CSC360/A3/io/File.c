@@ -916,7 +916,7 @@ void delete_file(FILE* disk, int parentDirectoryBlockNumber, char* currentFileNa
 
 void deleteDirectory(FILE* disk, int parentDirectoryBlockNumber, char* currentFileName, int deleteDirectoryInodeNumber){
 	short delBlockNumber[12];
-	int deleteInodeBlockNumber = findMapping(disk, delBlockNumber);
+	int deleteInodeBlockNumber = findMapping(disk, deleteDirectoryInodeNumber);
 	readInode(disk, deleteInodeBlockNumber, delBlockNumber);
 	
 	for(int i = 0; delBlockNumber[i] != -1; i++){
@@ -926,8 +926,8 @@ void deleteDirectory(FILE* disk, int parentDirectoryBlockNumber, char* currentFi
 	deleteFreeBlockVector(disk, deleteDirectoryInodeNumber);
 	NUM_INODE--;
 	updateSuperblock(disk);
-	deleteMapping(delBlockNumber);
-	deleteEntryDirectoryBlock(disk, parentDirectoryBlockNumber, delBlockNumber);
+	deleteMapping(deleteDirectoryInodeNumber);
+	deleteEntryDirectoryBlock(disk, parentDirectoryBlockNumber, deleteDirectoryInodeNumber);
 }
 
 
