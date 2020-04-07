@@ -673,7 +673,7 @@ void openFile(FILE* disk, char* input){
 			}
 
 			if(checkingInode < 1){
-				printf("\n	No such directory or file in this datablock: '%s'\n", currentFileName);
+				printf("\n	# No such directory or file in this datablock: '%s'\n", currentFileName);
 				break;
 			}
 			
@@ -698,7 +698,7 @@ void openFile(FILE* disk, char* input){
 				
 				printf("\n\n");
 			} else {
-				printf("\n	content of the file: \n");
+				printf("\n	# Content of the file: \n");
 
 				for(int i = 0;(resultBlockNum[i] != -1) &&(i<10); i++){
 					char* buffer = (char*)calloc(BLOCK_SIZE,1);	
@@ -726,7 +726,7 @@ void openFile(FILE* disk, char* input){
 			}
 			
 			if(checkingInode < 1){
-				printf("\n	no such directory in this datablock: '%s'\n", currentFileName);
+				printf("\n	# No such directory in this datablock: '%s'\n", currentFileName);
 				break;
 			}
 		}
@@ -766,7 +766,7 @@ void makeDirectory(FILE* disk, char* input){
 
 		if(fakeCurrentDirectoryName == NULL){
 			create_sub_directory(disk, savedParentInodeBlock, currentDirectoryName);
-			printf("\n	#We added a sub directory: %s\n", currentDirectoryName);
+			printf("\n	# We added a sub directory: %s\n", currentDirectoryName);
 		} else {
 			int checking_inode_num;		
 			short result_block_num[12];
@@ -781,7 +781,7 @@ void makeDirectory(FILE* disk, char* input){
 			}
 			
 			if(checking_inode_num < 1){
-				printf("\n	No such directory in this datablock: '%s'\n", currentDirectoryName);
+				printf("\n	# No such directory in this datablock: '%s'\n", currentDirectoryName);
 				break;
 			}
 		}
@@ -818,7 +818,7 @@ void writeFile(FILE* disk, char* input, char* fileContent){
 
 		if(fakeCurrentDirectoryName == NULL){
 			createFile(disk, fileContent, savedParent, currentFileName);
-			printf("\n	#We added a file, file name: %s\n", currentFileName);
+			printf("\n	# We added a file, file name: %s\n", currentFileName);
 		} else {
 			int checking_inode_num;		
 			short resultBlock2[12];
@@ -833,7 +833,7 @@ void writeFile(FILE* disk, char* input, char* fileContent){
 			}
 			
 			if(checking_inode_num < 1){
-				printf("\n	No such directory in this datablock: '%s'\n", currentFileName);
+				printf("\n	# No such directory in this datablock: '%s'\n", currentFileName);
 				break;
 			}
 		}
@@ -844,124 +844,90 @@ void writeFile(FILE* disk, char* input, char* fileContent){
 }
 
 
-
-void write_empty_file(FILE* disk, char* input){
+void writeEmptyFile(FILE* disk, char* input){
 	
-	char* parent_directory_name = (char*)calloc(31,1);	
-	char* curr_file_name = (char*)calloc(31,1);	
-	char* fake_curr_dir_name = (char*)calloc(31,1);	
-	
+	char* parentDirectoryName = (char*)calloc(31,1);	
+	char* currentFileName = (char*)calloc(31,1);	
+	char* fakeCurrentDirectoryName = (char*)calloc(31,1);	
 	const char s[2] = "/";
 
-	fake_curr_dir_name = strtok(input, s);		// skip the first command "Mkfile"
-
-	strncpy(parent_directory_name, curr_file_name, 31);
-	strncpy(curr_file_name, fake_curr_dir_name, 31);
+	fakeCurrentDirectoryName = strtok(input, s);		// skip the first command "Mkfile"
+	strncpy(parentDirectoryName, currentFileName, 31);
+	strncpy(currentFileName, fakeCurrentDirectoryName, 31);
+	fakeCurrentDirectoryName = strtok(NULL, s);
 	
-	fake_curr_dir_name = strtok(NULL, s);
+	int savedParentInode = -1;
+	int newestROOTINODEINDEX = getRootInodeIndex(disk);
+	int rootInodeBlockNum = findMapping(disk, newestROOTINODEINDEX);
+	short resultBlock[12];
 	
-	int saved_parent_inode_block_num = -1;
+	readInode(disk, rootInodeBlockNum, resultBlock);
+	savedParentInode = rootInodeBlockNum;
 	
-		int newest_ROOT_INODE_INDEX = getRootInodeIndex(disk);
+	while(fakeCurrentDirectoryName != NULL) {
+		strncpy(parentDirectoryName, currentFileName, 31);
+		strncpy(currentFileName, fakeCurrentDirectoryName, 31);
+		fakeCurrentDirectoryName = strtok(NULL, s);
+		
+		if(fakeCurrentDirectoryName == NULL){
+			createEmptyFile(disk, savedParentInode, currentFileName);
+			printf("\n	# We added an empty file, file name: %s\n\n", currentFileName);
+		} else {
+			int checkingInode;		
+			short resultBlock2[12];
+			readInode(disk, savedParentInode, resultBlock2);
 			
-		int root_inode_block_num = findMapping(disk, newest_ROOT_INODE_INDEX);
-
-		short result_block_num4[12];
-		readInode(disk, root_inode_block_num, result_block_num4);
-			
-		saved_parent_inode_block_num = root_inode_block_num;
-	
-	while(fake_curr_dir_name != NULL) {
-
-		strncpy(parent_directory_name, curr_file_name, 31);
-		strncpy(curr_file_name, fake_curr_dir_name, 31);
-		fake_curr_dir_name = strtok(NULL, s);
-		//printf("curr_file_name: %s ", curr_file_name);
-		//printf("parent_directory_name: %s\n", parent_directory_name);
-
-		if(fake_curr_dir_name == NULL){
-			
-			createEmptyFile(disk, saved_parent_inode_block_num, curr_file_name);
-
-			printf("\n       $$$$$$$$$$$$$$ we added an empty file, file name: %s\n\n", curr_file_name);
-		}
-		else{
-
-			int checking_inode_num;		
-			short result_block_num[12];
-	
-			readInode(disk, saved_parent_inode_block_num, result_block_num);
-			
-			for(int i = 0; result_block_num[i] != -1; i++){
-			
-				searchFileOrDirectory(disk, result_block_num[i], curr_file_name, &checking_inode_num);
+			for(int i = 0; resultBlock2[i] != -1; i++){
+				searchFileOrDirectory(disk, resultBlock2[i], currentFileName, &checkingInode);
 				
-				if(checking_inode_num > 0){
-					
-					saved_parent_inode_block_num = findMapping(disk, checking_inode_num);
+				if(checkingInode > 0){
+					savedParentInode = findMapping(disk, checkingInode);
 				}
 			}
 			
-			if(checking_inode_num < 1){
-				printf("\n      no such directory in this datablock: '%s'   \n", curr_file_name);
+			if(checkingInode < 1){
+				printf("\n	# No such directory in this datablock: '%s'\n", currentFileName);
 				break;
 			}
 		}
 	}
-	free(parent_directory_name);
-	free(curr_file_name);
-	free(fake_curr_dir_name);	
+	free(parentDirectoryName);
+	free(currentFileName);
+	free(fakeCurrentDirectoryName);	
 }
 
 
-void delete_file(FILE* disk, int parent_dir_block_num, char* curr_file_name, int del_file_inode_num){
+void delete_file(FILE* disk, int parentDirectoryBlockNumber, char* currentFileName, int deleteFileInodeNumber){
+	short deleteBlock[12];
+	int deleteInodeBlockNumber = findMapping(disk, deleteFileInodeNumber);
+	readInode(disk, deleteInodeBlockNumber, deleteBlock);
 
-	// free file block + inode block
-	// parent dir data block inside remove file
-	// delete inode mapping	
-	
-	short del_block_num[12];
-	int del_inode_block_num = findMapping(disk, del_file_inode_num);
-
-	readInode(disk, del_inode_block_num, del_block_num);
-
-	for(int i = 0; del_block_num[i] != -1; i++){
-		deleteFreeBlockVector(disk, del_block_num[i]);
+	for(int i = 0; deleteBlock[i] != -1; i++){
+		deleteFreeBlockVector(disk, deleteBlock[i]);
 	}
 	
-	deleteFreeBlockVector(disk, del_inode_block_num);
+	deleteFreeBlockVector(disk, deleteInodeBlockNumber);
 	NUM_INODE--;
 	updateSuperblock(disk);
-	
-	deleteMapping(disk, del_file_inode_num);
-	
-	deleteEntryDirectoryBlock(disk, parent_dir_block_num, del_file_inode_num);
+	deleteMapping(disk, deleteFileInodeNumber);
+	deleteEntryDirectoryBlock(disk, parentDirectoryBlockNumber, deleteFileInodeNumber);
 }
 
 
-void delete_directory(FILE* disk, int parent_dir_block_num, char* curr_file_name, int del_dir_inode_num){
+void deleteDirectory(FILE* disk, int parentDirectoryBlockNumber, char* currentFileName, int deleteDirectoryInodeNumber){
+	short delBlockNumber[12];
+	int deleteDirectoryInodeNumber = findMapping(disk, delBlockNumber);
+	readInode(disk, deleteDirectoryInodeNumber, delBlockNumber);
 	
-
-	// free file block + inode block
-	// parent dir data block inside remove file
-	// delete inode mapping	
-	
-	short del_block_num[12];
-	int del_inode_block_num = findMapping(disk, del_dir_inode_num);
-	
-	readInode(disk, del_inode_block_num, del_block_num);
-	
-	for(int i = 0; del_block_num[i] != -1; i++){
-		deleteFreeBlockVector(disk, del_block_num[i]);
+	for(int i = 0; delBlockNumber[i] != -1; i++){
+		deleteFreeBlockVector(disk, delBlockNumber[i]);
 	}
 	
-	deleteFreeBlockVector(disk, del_inode_block_num);
+	deleteFreeBlockVector(disk, deleteDirectoryInodeNumber);
 	NUM_INODE--;
 	updateSuperblock(disk);
-	
-	deleteMapping(disk, del_dir_inode_num);
-	
-	deleteEntryDirectoryBlock(disk, parent_dir_block_num, del_dir_inode_num);
+	deleteMapping(delBlockNumber);
+	deleteEntryDirectoryBlock(disk, parentDirectoryBlockNumber, delBlockNumber);
 }
 
 
@@ -1263,7 +1229,7 @@ void Rm_dir(FILE* disk, char* input){
 				break;
 			}
 			
-			delete_directory(disk, result_block_num[file_appear_in_which_block_of_directory], curr_dir_name, checking_inode_num);
+			deleteDirectory(disk, result_block_num[file_appear_in_which_block_of_directory], curr_dir_name, checking_inode_num);
 
 			printf("\n       $$$$$$$$$$$$$$ we deleted a directory, directory name: %s\n\n", curr_dir_name);
 		}
@@ -1344,7 +1310,7 @@ void command_input(FILE* disk, char* input, char* file_content_larger){
 	else if((strncmp(command7, "Writefile", 6) == 0) && file_content_larger == NULL){
 
 		printf("we are making a new empty file at '%s'", path);
-		write_empty_file(disk, input);
+		writeEmptyFile(disk, input);
 	}
 	else if(strncmp(command7, "Writefile", 6) == 0){			
 		
