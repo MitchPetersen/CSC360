@@ -1000,7 +1000,7 @@ void rmFile(FILE* disk, char* input){
 	free(fakeCurrentDirectoryName);	
 }
 
-void listFile(FILE* disk, char* input){	
+void listFile(FILE* disk, char* input, char* path){	
 	char* parentDirectoryName = (char*)calloc(31,1);	
 	char* currentDirectoryName = (char*)calloc(31,1);	
 	char* fakeCurrentDirectoryName = (char*)calloc(31,1);	
@@ -1022,7 +1022,7 @@ void listFile(FILE* disk, char* input){
 	if(fakeCurrentDirectoryName == NULL){
 			short result_block_num[12];
 			readInode(disk, savedParentInodeBlockNumber, result_block_num);	
-			printf("\n	# Here is all the file in %s directory: \n", currentDirectoryName);
+			printf("\n	# Here is all the file in %s directory: \n", path);
 
 			for(int i = 0;(result_block_num[i] != -1) &&(i<10); i++){
 				short inode_num_empty = 0;
@@ -1041,15 +1041,14 @@ void listFile(FILE* disk, char* input){
 				}
 				free(buffer3);
 			}
-			printf("\n	# We listed all the files in %s directory \n", currentDirectoryName);
+			printf("\n	# We listed all the files in %s directory \n", path);
 	}
 
 	while(fakeCurrentDirectoryName != NULL) {
-
 		strncpy(parentDirectoryName, currentDirectoryName, 31);
 		strncpy(currentDirectoryName, fakeCurrentDirectoryName, 31);
 		fakeCurrentDirectoryName = strtok(NULL, s);
-		printf("%s", fakeCurrentDirectoryName);
+		
 		if(fakeCurrentDirectoryName == NULL){
 			int checking_inode_num;		
 			short result_block_num3[12];
@@ -1064,13 +1063,13 @@ void listFile(FILE* disk, char* input){
 			}
 			
 			if(checking_inode_num < 1){
-				printf("\n      no such directory in this datablock: '%s'   \n", currentDirectoryName);
+				printf("\n # No such directory in this datablock: '%s'   \n", path);
 				break;
 			}
 
 			short result_block_num[12];
 			readInode(disk, savedParentInodeBlockNumber, result_block_num);	
-			printf("\n\n         here is all the file in %s directory: \n\n", currentDirectoryName);
+			printf("\n	# Here is all the file in %s directory: \n", path);
 
 			for(int i = 0;(result_block_num[i] != -1) &&(i<10); i++){
 				short inode_num_empty = 0;
@@ -1083,13 +1082,13 @@ void listFile(FILE* disk, char* input){
 					memcpy(&inode_num_empty, buffer3 +(i*32), 1);
 
 					if(inode_num_empty != 0) {
-						printf("         #### file name %d : %s\n", i, buffer4);
+						printf("	# file name %d : %s\n", i, buffer4);
 					}
 					free(buffer4); 
 				}
 				free(buffer3);
 			}
-			printf("\n       $$$$$$$$$$$$$$ we listed all the file in %s directory \n\n", currentDirectoryName);
+			printf("\n	# We listed all the file in %s directory\n", path);
 		} else {
 			int checking_inode_num;		
 			short result_block_num[12];
@@ -1104,7 +1103,7 @@ void listFile(FILE* disk, char* input){
 			}
 			
 			if(checking_inode_num < 1){
-				printf("\n      no such directory in this datablock: '%s'   \n", currentDirectoryName);
+				printf("\n # No such directory in this datablock: '%s'   \n", path);
 				break;
 			}
 		}
@@ -1184,22 +1183,21 @@ void rmDir(FILE* disk, char* input){
 	free(fakeCurrentDirectoryName);	
 }
 
-void command_input(FILE* disk, char* input, char* file_content_larger){
+void command_input(FILE* disk, char* input, char* fileContent){
 
 	char tok_string7[10];
 	strncpy(tok_string7, input, 6);
 	char* command7 = (char*)calloc(60,1);	
 	char s[2] = "/";
 	command7 = strtok(tok_string7, s);		// skip the first command "open"
-	
 	char* input2 = (char*)calloc(60,1);
 	strncpy(input2, input, 60);
 	char* path = (char*)calloc(60,1);
 	path = strtok(input2, "/");
 	path = strtok(NULL, "");
 	
-	if(file_content_larger != NULL){
-		robustSuperblock(disk, input, strlen(file_content_larger));
+	if(fileContent != NULL){
+		robustSuperblock(disk, input, strlen(fileContent));
 	}else{
 		robustSuperblock(disk, input, 0);
 	}
@@ -1209,40 +1207,26 @@ void command_input(FILE* disk, char* input, char* file_content_larger){
 	}
 	
 	printf("\n\ntest case %d: ", x++);
-
 	if(strncmp(command7, "list", 4) == 0){		
-	
-		printf("we are listing the file in a directory at '%s'", path);
-		listFile(disk, input);
-	}
-	else if(strncmp(command7, "Open", 4) == 0){
-		
-		printf("we are opening a file at '%s'", path);
+		printf("Listing the file in a directory at '%s'", path);
+		listFile(disk, input, path);
+	} else if(strncmp(command7, "Open", 4) == 0){
+		printf("Opening a file at '%s'", path);
 		openFile(disk, input);
-	}
-	else if(strncmp(command7, "Rmdir", 5) == 0){		
-		
-		printf("we are deleting a directory at '%s'", path);
+	} else if(strncmp(command7, "Rmdir", 5) == 0){		
+		printf("Deleting a directory at '%s'", path);
 		rmDir(disk, input);
-	}
-	else if(strncmp(command7, "Rmfile", 6) == 0){
-		
-		printf("we are deleting a file at '%s'", path);
+	} else if(strncmp(command7, "Rmfile", 6) == 0){
+		printf("Deleting a file at '%s'", path);
 		rmFile(disk, input);
-	}
-	else if((strncmp(command7, "Writefile", 6) == 0) && file_content_larger == NULL){
-
-		printf("we are making a new empty file at '%s'", path);
+	} else if((strncmp(command7, "Writefile", 6) == 0) && fileContent == NULL){
+		printf("Making a new empty file at '%s'", path);
 		writeEmptyFile(disk, input);
-	}
-	else if(strncmp(command7, "Writefile", 6) == 0){			
-		
-		printf("we are making a new file with content at '%s'", path);
-		writeFile(disk, input, file_content_larger);
-	}
-	else if(strncmp(command7, "Mkdir", 5) == 0){		
-		
-		printf("we are making a directory at '%s'", path);
+	} else if(strncmp(command7, "Writefile", 6) == 0){			
+		printf("Making a new file with content at '%s'", path);
+		writeFile(disk, input, fileContent);
+	} else if(strncmp(command7, "Mkdir", 5) == 0){		
+		printf("Making a directory at '%s'", path);
 		makeDirectory(disk, input);
 	}
 }
