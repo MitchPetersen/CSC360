@@ -1,0 +1,35 @@
+FCFS, start position 0
+Servicing 19
+Servicing 73
+Servicing 2
+Servicing 15
+Servicing 16
+Servicing 180
+Servicing 12
+Servicing 65
+Servicing 34
+Servicing 67
+Servicing 34
+Servicing 82
+Servicing 13
+Servicing 42
+Servicing 102
+Seek time of 846
+
+SSTF, start position 0
+Servicing 2
+Servicing 12
+Servicing 13
+Servicing 15
+Servicing 16
+Servicing 19
+Servicing 34
+Servicing 34
+Servicing 42
+Servicing 65
+Servicing 67
+Servicing 73
+Servicing 82
+Servicing 102
+Servicing 180
+Seek time of 180
