@@ -1,4 +1,0 @@
-I am the parent 25889
-I am the child 0
-a.out  processes.c
-Child Complete
