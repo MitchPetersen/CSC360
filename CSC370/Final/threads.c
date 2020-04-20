@@ -7,7 +7,18 @@
 struct dirent *readdir(DIR *dirp);
 
 void *myread() {
-	printf(readdir());
+	pritnf("in thread");
+	struct dirent *de;
+	DIR *dir = opendir("."); 
+	if (dir == NULL)
+    { 
+        printf("Couldn't open current directory" ); 
+        return 0; 
+    }
+	while ((de = readdir(dir)) != NULL) 
+            printf("%s\n", de->d_name); 
+		
+	closedir(dir);
 }
 
 int main()
