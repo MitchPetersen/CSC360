@@ -24,13 +24,13 @@ int main()
 	
 	printf("SSTF, start position 0\n");
 	seek = 0;
-	int arr[15] = {2,12,13,15,16,19,34,34,42,65,67,73,82,102,180};
+	int arr2[15] = {2,12,13,15,16,19,34,34,42,65,67,73,82,102,180};
 	for (int j=0; j<15; j++) {
-		printf("Servicing %i\n", arr[j]);
+		printf("Servicing %i\n", arr2[j]);
 		if(j>=1) {
-			seek += abs(arr[j]-arr[j-1]);
+			seek += abs(arr2[j]-arr2[j-1]);
 		} else {
-			seek += arr[j];
+			seek += arr2[j];
 		}
 	}
 	printf("Seek time of %i\n\n", seek);
