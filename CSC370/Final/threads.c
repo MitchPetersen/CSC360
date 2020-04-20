@@ -7,7 +7,7 @@
 struct dirent *readdir(DIR *dirp);
 
 void *myread() {
-	pritnf("in thread");
+	printf("in thread");
 	struct dirent *de;
 	DIR *dir = opendir("."); 
 	if (dir == NULL)
