@@ -13,11 +13,11 @@ int main()
 	printf("FCFS, start position 0");
 	int seek = 0;
 	for (int i=0; i<15; i++) {
-		printf("Servicing %i\n", arr[i]
+		printf("Servicing %i\n", arr[i]);
 		if(i>=1) {
-			seek += abs(arr[i]-arr[i-1])
+			seek += abs(arr[i]-arr[i-1]);
 		} else {
-			seek += arr[i]
+			seek += arr[i];
 		}
 	}
 	
