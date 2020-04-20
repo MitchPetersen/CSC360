@@ -7,7 +7,7 @@
 struct dirent *readdir(DIR *dirp);
 
 void *myread() {
-	printf("in thread");
+	printf("in thread\n");
 	struct dirent *de;
 	DIR *dir = opendir("."); 
 	if (dir == NULL)
@@ -16,7 +16,7 @@ void *myread() {
         return 0; 
     }
 	while ((de = readdir(dir)) != NULL) 
-            printf("%s\n", de->d_name); 
+            printf("%s ", de->d_name); 
 		
 	closedir(dir);
 }
@@ -27,6 +27,6 @@ int main()
 	pthread_t th_id;
 	pthread_create(&th_id, NULL, myread, NULL);
 	pthread_join(th_id, NULL);
-	printf("after thread\n");
+	printf("\nafter thread\n");
     return 0;
 }
