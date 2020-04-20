@@ -1,0 +1,10 @@
+1. Which members are part of the Platinum membership type?
+2. Which non-members are instructors for a camp?
+3. How many members are in the company meeting 'camp'?
+4. Who was the most recent person (and what is their contact information) to sign up for a membership?
+5. What are the membership levels for those who have bought merch?
+6. What are the names of the people who have signed up for quarterly passes?
+7. Find the members and their ID of those who are not part of a camp?
+8. What are the transaction details of those with drop-in duration?
+9. What are the names of the members who are instructing camps?
+10. Find all the members who have bought merch at least two times.

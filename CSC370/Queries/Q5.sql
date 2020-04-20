@@ -1,0 +1,1 @@
+create view Q5 as select membership_type from Members where fitness_center_ID in (select fitness_center_ID from Members INTERSECT select Fitness_Center_ID from merch);

@@ -1,0 +1,1 @@
+create view Q2 as select name from Non_Members where Is_Instructor = True;

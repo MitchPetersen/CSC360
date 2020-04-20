@@ -1,0 +1,1 @@
+create view Q1 as select name from Members where membership_type = 'Platinum';

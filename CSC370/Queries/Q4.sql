@@ -1,0 +1,1 @@
+create view Q4 as select name, Contact_Information from Members where Fitness_Center_ID = (select max(fitness_Center_ID) from members);

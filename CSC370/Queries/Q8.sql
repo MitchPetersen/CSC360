@@ -1,0 +1,1 @@
+create view Q8 as select transaction_details from Passes where duration = 'Drop-In';

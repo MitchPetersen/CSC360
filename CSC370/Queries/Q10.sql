@@ -1,0 +1,1 @@
+create view Q10 as select name from Members where fitness_center_id in (select fitness_center_ID from merch group by fitness_center_ID having count(fitness_center_ID) > 1);

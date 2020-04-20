@@ -1,0 +1,1 @@
+create view Q9 as select distinct name from Members natural join (select fitness_center_ID as Camp_ID, instructor_ID as Fitness_Center_ID from camp where fitness_center_ID IS NOT NULL) as foo;

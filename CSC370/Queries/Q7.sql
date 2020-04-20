@@ -1,0 +1,1 @@
+create view Q7 as select name, fitness_center_ID from Members where not exists (select fitness_Center_ID from camp where camp.fitness_center_ID = members.fitness_center_ID);
