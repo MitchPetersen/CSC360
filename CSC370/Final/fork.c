@@ -14,8 +14,8 @@ int main(int argc, char **argv) {
 	fork();
 	fork();
 
-	pid_t pid = getpid()
-	pid_t ppid = getppid()
+	pid_t pid = getpid();
+	pid_t ppid = getppid();
 	
 	fprintf(out, "this process is %lun and it's parent is %lun\n", pid, ppid);
 }
