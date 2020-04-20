@@ -7,7 +7,7 @@
 struct dirent *readdir(DIR *dirp);
 
 void *myread() {
-	readdir();
+	printf(readdir());
 }
 
 int main()
