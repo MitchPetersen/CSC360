@@ -1,8 +1,8 @@
-this process is 25324n and it's parent is 24379n
-this process is 25328n and it's parent is 25324n
-this process is 25331n and it's parent is 25327n
-this process is 25325n and it's parent is 25324n
-this process is 25326n and it's parent is 25324n
-this process is 25330n and it's parent is 25326n
-this process is 25329n and it's parent is 25325n
-this process is 25327n and it's parent is 25325n
+this process is 25664 and it's parent is 24379
+this process is 25665 and it's parent is 25664
+this process is 25667 and it's parent is 25665
+this process is 25666 and it's parent is 25664
+this process is 25671 and it's parent is 25667
+this process is 25670 and it's parent is 25666
+this process is 25669 and it's parent is 25665
+this process is 25668 and it's parent is 25664
