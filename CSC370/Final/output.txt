@@ -1,0 +1,8 @@
+this process is 25324n and it's parent is 24379n
+this process is 25328n and it's parent is 25324n
+this process is 25331n and it's parent is 25327n
+this process is 25325n and it's parent is 25324n
+this process is 25326n and it's parent is 25324n
+this process is 25330n and it's parent is 25326n
+this process is 25329n and it's parent is 25325n
+this process is 25327n and it's parent is 25325n
