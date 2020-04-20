@@ -12,7 +12,7 @@ int main()
 	int arr[15] = {19, 73, 2, 15, 16, 180, 12, 65, 34, 67, 34, 82, 13, 42, 102};
 	int loop;
 	for (loop = 0; loop < 15; loop++){
-		printf("%d, ", arr[loop];
+		printf("%d, ", arr[loop]);
 	}
 	
 	printf("\nFCFS, start position 0\n");
